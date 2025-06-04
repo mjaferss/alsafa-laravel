@@ -1,21 +1,21 @@
 @extends('layouts.admin_new')
 
-@section('title', __('branches.list'))
+@section('title', __('sections.list'))
 
 @section('content')
 <div class="container-fluid py-4">
     <div class="card">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">{{ __('branches.list_title') }}</h5>
+                <h5 class="mb-0">{{ __('sections.list_title') }}</h5>
                 @if(in_array(auth()->user()->role, ['super_admin', 'manager']))
-                    <a href="{{ route('admin.branches.create') }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus me-2"></i> {{ __('branches.add_new') }}
+                    <a href="{{ route('admin.sections.create') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-2"></i> {{ __('sections.add_new') }}
                     </a>
                 @endif
             </div>
             <div class="mt-3">
-                <form action="{{ route('admin.branches.index') }}" method="GET" class="row g-3">
+                <form action="{{ route('admin.sections.index') }}" method="GET" class="row g-3">
                     <div class="col-md-4">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
@@ -24,7 +24,7 @@
                     </div>
                     <div class="col-md-3">
                         <select class="form-select" name="is_active">
-                            <option value="">{{ __('branches.fields.status') }}</option>
+                            <option value="">{{ __('sections.fields.status') }}</option>
                             <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>{{ __('common.active') }}</option>
                             <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>{{ __('common.inactive') }}</option>
                         </select>
@@ -33,7 +33,7 @@
                         <button type="submit" class="btn btn-primary w-100">{{ __('common.search') }}</button>
                     </div>
                     <div class="col-md-2">
-                        <a href="{{ route('admin.branches.index') }}" class="btn btn-secondary w-100">{{ __('common.reset') }}</a>
+                        <a href="{{ route('admin.sections.index') }}" class="btn btn-secondary w-100">{{ __('common.reset') }}</a>
                     </div>
                 </form>
             </div>
@@ -44,39 +44,36 @@
                     <thead>
                         <tr>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                {{ app()->getLocale() == 'ar' ? __('branches.fields.name_ar') : __('branches.fields.name_en') }}
+                                {{ app()->getLocale() == 'ar' ? __('sections.fields.name_ar') : __('sections.fields.name_en') }}
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-md-table-cell">{{ __('branches.fields.phone') }}</th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ __('branches.fields.status') }}</th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-md-table-cell">{{ __('branches.fields.created_at') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ __('sections.fields.cost') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ __('sections.fields.status') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-md-table-cell">{{ __('sections.fields.created_at') }}</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">{{ __('common.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($branches as $branch)
+                        @forelse($sections as $section)
                         <tr>
                             <td class="align-middle">
                                 <div class="d-flex px-2 py-1">
                                     <div class="d-flex flex-column justify-content-center">
                                         <h6 class="mb-0 text-sm">
-                                            {{ app()->getLocale() == 'ar' ? $branch->name_ar : $branch->name_en }}
+                                            {{ app()->getLocale() == 'ar' ? $section->name_ar : $section->name_en }}
                                         </h6>
-                                        <p class="text-xs text-secondary mb-0 d-md-none">
-                                            {{ $branch->phone }}
-                                        </p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="align-middle d-none d-md-table-cell">
-                                <p class="text-sm font-weight-bold mb-0">{{ $branch->phone }}</p>
+                            <td class="align-middle">
+                                <p class="text-sm font-weight-bold mb-0">{{ number_format($section->cost, 2) }}</p>
                             </td>
                             <td class="align-middle">
-                                <span class="badge {{ $branch->is_active ? 'bg-success' : 'bg-danger' }}">
-                                    {{ $branch->is_active ? __('common.active') : __('common.inactive') }}
+                                <span class="badge {{ $section->is_active ? 'bg-success' : 'bg-danger' }}">
+                                    {{ $section->is_active ? __('common.active') : __('common.inactive') }}
                                 </span>
                             </td>
                             <td class="align-middle d-none d-md-table-cell">
-                                <p class="text-sm font-weight-bold mb-0">{{ $branch->created_at->format('Y-m-d') }}</p>
+                                <p class="text-sm font-weight-bold mb-0">{{ $section->created_at->format('Y-m-d') }}</p>
                             </td>
                             <td class="align-middle text-center text-sm">
                                 <div class="dropdown">
@@ -85,31 +82,31 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li>
-                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewBranchModal{{ $branch->id }}">
-                                                <i class="fas fa-eye me-2"></i> {{ __('branches.actions.view') }}
+                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewSectionModal{{ $section->id }}">
+                                                <i class="fas fa-eye me-2"></i> {{ __('sections.actions.view') }}
                                             </a>
                                         </li>
                                         @if(in_array(auth()->user()->role, ['super_admin', 'manager']))
                                             <li>
-                                                <a class="dropdown-item" href="{{ route('admin.branches.edit', $branch) }}">
-                                                    <i class="fas fa-edit me-2"></i> {{ __('branches.actions.edit') }}
+                                                <a class="dropdown-item" href="{{ route('admin.sections.edit', $section) }}">
+                                                    <i class="fas fa-edit me-2"></i> {{ __('sections.actions.edit') }}
                                                 </a>
                                             </li>
                                             <li>
-                                                <form action="{{ route('admin.branches.destroy', $branch) }}" method="POST" class="d-inline">
+                                                <form action="{{ route('admin.sections.destroy', $section) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="dropdown-item" onclick="return confirm('{{ __('branches.confirmations.delete') }}')">
-                                                        <i class="fas fa-trash me-2"></i> {{ __('branches.actions.delete') }}
+                                                    <button type="submit" class="dropdown-item" onclick="return confirm('{{ __('sections.confirmations.delete') }}')">
+                                                        <i class="fas fa-trash me-2"></i> {{ __('sections.actions.delete') }}
                                                     </button>
                                                 </form>
                                             </li>
                                             <li>
-                                                <form action="{{ route('admin.branches.toggle-status', $branch) }}" method="POST" class="d-inline">
+                                                <form action="{{ route('admin.sections.toggle-status', $section) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     <button type="submit" class="dropdown-item">
-                                                        <i class="fas {{ $branch->is_active ? 'fa-ban' : 'fa-check' }} me-2"></i>
-                                                        {{ $branch->is_active ? __('branches.deactivate') : __('branches.activate') }}
+                                                        <i class="fas {{ $section->is_active ? 'fa-ban' : 'fa-check' }} me-2"></i>
+                                                        {{ $section->is_active ? __('sections.deactivate') : __('sections.activate') }}
                                                     </button>
                                                 </form>
                                             </li>
@@ -119,12 +116,12 @@
                             </td>
                         </tr>
 
-                        <!-- View Branch Modal -->
-                        <div class="modal fade" id="viewBranchModal{{ $branch->id }}" tabindex="-1" aria-labelledby="viewBranchModalLabel{{ $branch->id }}" aria-hidden="true">
+                        <!-- View Section Modal -->
+                        <div class="modal fade" id="viewSectionModal{{ $section->id }}" tabindex="-1" aria-labelledby="viewSectionModalLabel{{ $section->id }}" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="viewBranchModalLabel{{ $branch->id }}">{{ __('branches.details') }}</h5>
+                                        <h5 class="modal-title" id="viewSectionModalLabel{{ $section->id }}">{{ __('sections.details') }}</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
@@ -133,68 +130,70 @@
                                                 <div class="row gx-4">
                                                     <div class="col-auto my-auto">
                                                         <div class="h-100">
-                                                            <h5 class="mb-1">{{ app()->getLocale() == 'ar' ? $branch->name_ar : $branch->name_en }}</h5>
+                                                            <h5 class="mb-1">{{ app()->getLocale() == 'ar' ? $section->name_ar : $section->name_en }}</h5>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="row mt-4">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('branches.fields.name_ar') }}</label>
-                                                            <p class="form-control-static">{{ $branch->name_ar }}</p>
+                                                            <label class="form-control-label">{{ __('sections.fields.name_ar') }}</label>
+                                                            <p class="form-control-static">{{ $section->name_ar }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('branches.fields.name_en') }}</label>
-                                                            <p class="form-control-static">{{ $branch->name_en }}</p>
+                                                            <label class="form-control-label">{{ __('sections.fields.name_en') }}</label>
+                                                            <p class="form-control-static">{{ $section->name_en }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('branches.fields.address_ar') }}</label>
-                                                            <p class="form-control-static">{{ $branch->address_ar }}</p>
+                                                            <label class="form-control-label">{{ __('sections.fields.cost') }}</label>
+                                                            <p class="form-control-static">{{ number_format($section->cost, 2) }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('branches.fields.address_en') }}</label>
-                                                            <p class="form-control-static">{{ $branch->address_en }}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="form-control-label">{{ __('branches.fields.phone') }}</label>
-                                                            <p class="form-control-static">{{ $branch->phone }}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="form-control-label">{{ __('branches.fields.status') }}</label>
+                                                            <label class="form-control-label">{{ __('sections.fields.status') }}</label>
                                                             <p class="form-control-static">
-                                                                <span class="badge {{ $branch->is_active ? 'bg-success' : 'bg-danger' }}">
-                                                                    {{ $branch->is_active ? __('common.active') : __('common.inactive') }}
+                                                                <span class="badge {{ $section->is_active ? 'bg-success' : 'bg-danger' }}">
+                                                                    {{ $section->is_active ? __('common.active') : __('common.inactive') }}
                                                                 </span>
                                                             </p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('branches.fields.created_at') }}</label>
-                                                            <p class="form-control-static">{{ $branch->created_at->format('Y-m-d H:i') }}</p>
+                                                            <label class="form-control-label">{{ __('sections.fields.created_by') }}</label>
+                                                            <p class="form-control-static">{{ $section->creator->name }}</p>
+                                                        </div>
+                                                    </div>
+                                                    @if($section->updater)
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">{{ __('sections.fields.updated_by') }}</label>
+                                                            <p class="form-control-static">{{ $section->updater->name }}</p>
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">{{ __('sections.fields.created_at') }}</label>
+                                                            <p class="form-control-static">{{ $section->created_at->format('Y-m-d H:i') }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('branches.fields.updated_at') }}</label>
-                                                            <p class="form-control-static">{{ $branch->updated_at->format('Y-m-d H:i') }}</p>
+                                                            <label class="form-control-label">{{ __('sections.fields.updated_at') }}</label>
+                                                            <p class="form-control-static">{{ $section->updated_at->format('Y-m-d H:i') }}</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         @else
                                             <div class="alert alert-warning">
-                                                {{ __('branches.unauthorized_access') }}
+                                                {{ __('sections.unauthorized_access') }}
                                             </div>
                                         @endif
                                     </div>
@@ -214,73 +213,13 @@
                     </tbody>
                 </table>
                 <div class="d-flex justify-content-center mt-4">
-                    {{ $branches->appends(request()->query())->links('vendor.pagination.bootstrap-5') }}
+                    {{ $sections->appends(request()->query())->links('vendor.pagination.bootstrap-5') }}
                 </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    document.querySelectorAll('.toggle-status').forEach(button => {
-        button.addEventListener('click', function() {
-            const branchId = this.dataset.branchId;
-            const currentStatus = this.dataset.status;
-            
-            fetch(`/admin/branches/${branchId}/toggle-status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update button appearance
-                    this.classList.toggle('btn-secondary');
-                    this.classList.toggle('btn-success');
-                    
-                    // Update icon
-                    const icon = this.querySelector('i');
-                    icon.classList.toggle('fa-ban');
-                    icon.classList.toggle('fa-check');
-                    
-                    // Update status badge
-                    const statusBadge = this.closest('tr').querySelector('.badge');
-                    statusBadge.classList.toggle('bg-gradient-success');
-                    statusBadge.classList.toggle('bg-gradient-danger');
-                    statusBadge.textContent = currentStatus == 1 
-                        ? '{{ __("branches.status.inactive") }}'
-                        : '{{ __("branches.status.active") }}';
-                    
-                    // Update data attribute
-                    this.dataset.status = currentStatus == 1 ? '0' : '1';
-                    
-                    // Show success message
-                    Swal.fire({
-                        icon: 'success',
-                        title: '{{ __("common.success") }}',
-                        text: data.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: '{{ __("common.error") }}',
-                    text: '{{ __("common.something_went_wrong") }}'
-                });
-            });
-        });
-    });
-</script>
-@endpush
 
 @push('styles')
 <style>
@@ -297,4 +236,4 @@
         gap: 0.5rem !important;
     }
 </style>
-@endpush
+@endpush 

@@ -11,10 +11,52 @@ class TowerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $towers = Tower::with('branch')->latest()->paginate(10);
-        return view('towers.index', compact('towers'));
+        try {
+            $query = Tower::with(['branch' => function($query) {
+                $query->select('id', 'name_ar', 'name_en');
+            }]);
+
+            // Search
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('name_ar', 'like', "%{$search}%")
+                      ->orWhere('name_en', 'like', "%{$search}%");
+                });
+            }
+
+            // Filter by branch
+            if ($request->filled('branch_id')) {
+                $query->where('branch_id', $request->branch_id);
+            }
+
+            // Filter by status
+            if ($request->filled('is_active')) {
+                $query->where('is_active', $request->is_active == 'active');
+            }
+
+            $towers = $query->select('id', 'name_ar', 'name_en', 'branch_id', 'is_active', 'cost', 'description_ar', 'description_en', 'created_at', 'updated_at')
+                          ->latest()
+                          ->paginate(10);
+
+            $branches = Branch::select('id', 'name_ar', 'name_en')->get();
+
+            return view('admin.towers.index', [
+                'towers' => $towers,
+                'branches' => $branches,
+                'total_count' => $query->count()
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error in TowerController@index: ' . $e->getMessage());
+            return view('admin.towers.index', [
+                'towers' => collect([]),
+                'branches' => Branch::select('id', 'name_ar', 'name_en')->get(),
+                'error' => __('towers.messages.error_loading')
+            ]);
+        }
     }
 
     /**
@@ -23,7 +65,7 @@ class TowerController extends Controller
     public function create()
     {
         $branches = Branch::all();
-        return view('towers.create', compact('branches'));
+        return view('admin.towers.create', compact('branches'));
     }
 
     /**
@@ -35,16 +77,18 @@ class TowerController extends Controller
             'name_ar' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'branch_id' => 'required|exists:branches,id',
-            'floors_count' => 'required|integer|min:1',
-            'apartments_per_floor' => 'required|integer|min:1',
-            'description_ar' => 'required|string',
-            'description_en' => 'required|string',
-            'status' => 'required|in:active,under_maintenance,inactive',
+            'cost' => 'required|numeric|min:0',
+            'description_ar' => 'nullable|string',
+            'description_en' => 'nullable|string',
+            'is_active' => 'boolean',
         ]);
+
+        $validated['created_by'] = auth()->id();
+        $validated['updated_by'] = auth()->id();
 
         Tower::create($validated);
 
-        return redirect()->route('towers.index')
+        return redirect()->route('admin.towers.index')
             ->with('success', __('towers.messages.created'));
     }
 
@@ -54,7 +98,7 @@ class TowerController extends Controller
     public function edit(Tower $tower)
     {
         $branches = Branch::all();
-        return view('towers.edit', compact('tower', 'branches'));
+        return view('admin.towers.edit', compact('tower', 'branches'));
     }
 
     /**
@@ -66,16 +110,17 @@ class TowerController extends Controller
             'name_ar' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'branch_id' => 'required|exists:branches,id',
-            'floors_count' => 'required|integer|min:1',
-            'apartments_per_floor' => 'required|integer|min:1',
-            'description_ar' => 'required|string',
-            'description_en' => 'required|string',
-            'status' => 'required|in:active,under_maintenance,inactive',
+            'cost' => 'required|numeric|min:0',
+            'description_ar' => 'nullable|string',
+            'description_en' => 'nullable|string',
+            'is_active' => 'boolean',
         ]);
+
+        $validated['updated_by'] = auth()->id();
 
         $tower->update($validated);
 
-        return redirect()->route('towers.index')
+        return redirect()->route('admin.towers.index')
             ->with('success', __('towers.messages.updated'));
     }
 
@@ -86,7 +131,7 @@ class TowerController extends Controller
     {
         $tower->delete();
 
-        return redirect()->route('towers.index')
+        return redirect()->route('admin.towers.index')
             ->with('success', __('towers.messages.deleted'));
     }
 
@@ -96,10 +141,11 @@ class TowerController extends Controller
     public function toggleStatus(Tower $tower)
     {
         $tower->update([
-            'status' => $tower->status === 'active' ? 'inactive' : 'active'
+            'is_active' => !$tower->is_active,
+            'updated_by' => auth()->id()
         ]);
 
-        return redirect()->route('towers.index')
+        return redirect()->route('admin.towers.index')
             ->with('success', __('towers.messages.status_updated'));
     }
 }

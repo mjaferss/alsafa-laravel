@@ -11,20 +11,33 @@ class MainSection extends Model
 {
     use HasFactory, SoftDeletes, Localizable;
 
+    /**
+     * الحقول القابلة للتعبئة
+     */
     protected $fillable = [
         'name_ar',
         'name_en',
         'cost',
         'is_active',
         'created_by',
-        'updated_by'
+        'updated_by',
     ];
 
+    /**
+     * الحقول التي يجب معاملتها كتواريخ
+     */
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+
+    /**
+     * الحقول التي يجب تحويلها
+     */
     protected $casts = [
         'cost' => 'decimal:2',
         'is_active' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     /**

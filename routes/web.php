@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BranchController;
-use App\Http\Controllers\SectionController;
+use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\TowerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\LanguageController;
@@ -25,11 +25,13 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
-Route::middleware('auth')->group(function () {
-    // Sidebar routes
-    Route::post('/sidebar/toggle', [SidebarController::class, 'toggle'])->name('sidebar.toggle');
-    Route::get('/sidebar/state', [SidebarController::class, 'getState'])->name('sidebar.state');
-    // Dashboard - accessible by all authenticated users
+// Redirect old dashboard URL to new admin dashboard
+Route::get('/dashboard', function () {
+    return redirect()->route('admin.dashboard');
+})->middleware('auth');
+
+Route::middleware(['auth', 'role:super_admin,manager'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Users routes
@@ -38,20 +40,25 @@ Route::middleware('auth')->group(function () {
     
     // Branches routes
     Route::resource('branches', BranchController::class);
+    Route::post('branches/{branch}/toggle-status', [BranchController::class, 'toggleStatus'])->name('branches.toggle-status');
     
     // Towers routes
     Route::resource('towers', TowerController::class);
+    Route::post('towers/{tower}/toggle-status', [TowerController::class, 'toggleStatus'])->name('towers.toggle-status');
     
     // Sections routes
     Route::resource('sections', SectionController::class);
+    Route::post('sections/{section}/toggle-status', [SectionController::class, 'toggleStatus'])->name('sections.toggle-status');
     
     // Maintenance requests routes
     Route::resource('maintenance-requests', 'App\Http\Controllers\MaintenanceRequestController');
     
     // Activities routes
     Route::get('/activities', 'App\Http\Controllers\ActivityController@index')->name('activities.index');
-    
-    // Profile routes
+});
+
+// Profile routes
+Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

@@ -16,7 +16,7 @@
         <ul class="nav flex-column">
             <!-- Dashboard -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
                     <i class="fas fa-chart-line"></i>
                     <span>{{ __('nav.dashboard') }}</span>
                 </a>
@@ -24,7 +24,7 @@
 
             <!-- Users Section -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                <a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                     <i class="fas fa-users"></i>
                     <span>{{ __('menu.users') }}</span>
                 </a>
@@ -32,7 +32,7 @@
 
             <!-- Branches Section -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('branches*') ? 'active' : '' }}" href="{{ route('branches.index') }}">
+                <a class="nav-link {{ request()->is('admin/branches*') ? 'active' : '' }}" href="{{ route('admin.branches.index') }}">
                     <i class="fas fa-code-branch"></i>
                     <span>{{ __('menu.branches') }}</span>
                 </a>
@@ -40,7 +40,7 @@
 
             <!-- Towers Section -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('towers*') ? 'active' : '' }}" href="{{ route('towers.index') }}">
+                <a class="nav-link {{ request()->is('admin/towers*') ? 'active' : '' }}" href="{{ route('admin.towers.index') }}">
                     <i class="fas fa-city"></i>
                     <span>{{ __('menu.towers') }}</span>
                 </a>
@@ -48,7 +48,7 @@
 
             <!-- Departments Section -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('sections*') ? 'active' : '' }}" href="{{ route('sections.index') }}">
+                <a class="nav-link {{ request()->is('admin/sections*') ? 'active' : '' }}" href="{{ route('admin.sections.index') }}">
                     <i class="fas fa-sitemap"></i>
                     <span>{{ __('menu.departments') }}</span>
                 </a>
@@ -56,7 +56,7 @@
 
             <!-- Maintenance Requests -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('maintenance-requests*') ? 'active' : '' }}" href="{{ route('maintenance-requests.index') }}">
+                <a class="nav-link {{ request()->is('admin/maintenance-requests*') ? 'active' : '' }}" href="{{ route('admin.maintenance-requests.index') }}">
                     <i class="fas fa-tools"></i>
                     <span>{{ __('menu.maintenance') }}</span>
                 </a>
@@ -64,7 +64,7 @@
 
             <!-- Activities -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('activities*') ? 'active' : '' }}" href="{{ route('activities.index') }}">
+                <a class="nav-link {{ request()->is('admin/activities*') ? 'active' : '' }}" href="{{ route('admin.activities.index') }}">
                     <i class="fas fa-history"></i>
                     <span>{{ __('menu.activities') }}</span>
                 </a>

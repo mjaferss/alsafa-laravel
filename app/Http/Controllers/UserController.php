@@ -54,7 +54,7 @@ class UserController extends Controller
     {
         // Verificar si el usuario tiene permiso para crear usuarios
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('users.index')
+            return redirect()->route('admin.users.index')
                 ->with('error', __('users.unauthorized_edit'));
         }
         
@@ -69,7 +69,7 @@ class UserController extends Controller
     {
         // Verificar si el usuario tiene permiso para crear usuarios
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('users.index')
+            return redirect()->route('admin.users.index')
                 ->with('error', __('users.unauthorized_edit'));
         }
 
@@ -89,7 +89,7 @@ class UserController extends Controller
             'branch_id' => $request->branch_id,
         ]);
 
-        return redirect()->route('users.index')
+        return redirect()->route('admin.users.index')
             ->with('success', __('messages.user_created'));
     }
 
@@ -100,7 +100,7 @@ class UserController extends Controller
     {
         // Verificar si el usuario tiene permiso para editar usuarios
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('users.index')
+            return redirect()->route('admin.users.index')
                 ->with('error', __('users.unauthorized_edit'));
         }
         
@@ -115,7 +115,7 @@ class UserController extends Controller
     {
         // Verificar si el usuario tiene permiso para actualizar usuarios
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('users.index')
+            return redirect()->route('admin.users.index')
                 ->with('error', __('users.unauthorized_edit'));
         }
 
@@ -139,7 +139,7 @@ class UserController extends Controller
         $user->branch_id = $request->branch_id;
         $user->save();
 
-        return redirect()->route('users.index')
+        return redirect()->route('admin.users.index')
             ->with('success', __('messages.user_updated'));
     }
 
@@ -173,18 +173,18 @@ class UserController extends Controller
     {
         // Verificar si el usuario tiene permiso para eliminar usuarios
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('users.index')
+            return redirect()->route('admin.users.index')
                 ->with('error', __('users.unauthorized_edit'));
         }
 
         if ($user->id === auth()->id()) {
-            return redirect()->route('users.index')
+            return redirect()->route('admin.users.index')
                 ->with('error', __('messages.cannot_delete_self'));
         }
 
         $user->delete();
 
-        return redirect()->route('users.index')
+        return redirect()->route('admin.users.index')
             ->with('success', __('messages.user_deleted'));
     }
 }

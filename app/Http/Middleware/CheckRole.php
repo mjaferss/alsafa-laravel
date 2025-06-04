@@ -13,16 +13,22 @@ class CheckRole
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string  $role
+     * @param  string|array  $roles
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!$request->user()) {
             return redirect()->route('login')->with('error', __('auth.please_login'));
         }
 
-        if ($role !== 'any' && $request->user()->role !== $role) {
+        // If 'any' is in roles array, allow access
+        if (in_array('any', $roles)) {
+            return $next($request);
+        }
+
+        // Check if user has any of the required roles
+        if (!in_array($request->user()->role, $roles)) {
             return redirect()->route('home')->with('error', __('auth.unauthorized'));
         }
 

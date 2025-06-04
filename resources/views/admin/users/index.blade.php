@@ -8,13 +8,13 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">{{ __('users.list_title') }}</h5>
                 @if(in_array(auth()->user()->role, ['super_admin', 'manager']))
-                    <a href="{{ route('users.create') }}" class="btn btn-primary btn-sm">
+                    <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">
                         <i class="fas fa-plus me-2"></i> {{ __('users.add_new') }}
                     </a>
                 @endif
             </div>
             <div class="mt-3">
-                <form action="{{ route('users.index') }}" method="GET" class="row g-3">
+                <form action="{{ route('admin.users.index') }}" method="GET" class="row g-3">
                     <div class="col-md-4">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
@@ -97,12 +97,12 @@
                                         </li>
                                         @if(in_array(auth()->user()->role, ['super_admin', 'manager']))
                                             <li>
-                                                <a class="dropdown-item" href="{{ route('users.edit', $user) }}">
+                                                <a class="dropdown-item" href="{{ route('admin.users.edit', $user) }}">
                                                     <i class="fas fa-edit me-2"></i> {{ __('users.actions.edit') }}
                                                 </a>
                                             </li>
                                             <li>
-                                                <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
+                                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="dropdown-item" onclick="return confirm('{{ __('users.confirm_delete') }}')">
@@ -235,75 +235,57 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // تفعيل زر تبديل حالة المستخدم
-        const toggleButtons = document.querySelectorAll('.toggle-status');
-        toggleButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const userId = this.getAttribute('data-user-id');
-                const currentStatus = this.getAttribute('data-status');
-                
-                // إرسال طلب AJAX لتغيير الحالة
-                fetch(`/users/${userId}/toggle-status`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({})
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // تحديث واجهة المستخدم
-                        const newStatus = currentStatus == '1' ? '0' : '1';
-                        this.setAttribute('data-status', newStatus);
-                        
-                        // تغيير أيقونة الزر
-                        const icon = this.querySelector('i');
-                        if (newStatus == '1') {
-                            icon.classList.remove('fa-check');
-                            icon.classList.add('fa-ban');
-                            this.classList.remove('btn-success');
-                            this.classList.add('btn-secondary');
-                            this.title = '{{ __('users.status.inactive') }}';
-                        } else {
-                            icon.classList.remove('fa-ban');
-                            icon.classList.add('fa-check');
-                            this.classList.remove('btn-secondary');
-                            this.classList.add('btn-success');
-                            this.title = '{{ __('users.status.active') }}';
-                        }
-                        
-                        // تحديث شارة الحالة
-                        const statusBadge = this.closest('tr').querySelector('.badge');
-                        if (newStatus == '1') {
-                            statusBadge.classList.remove('bg-secondary');
-                            statusBadge.classList.add('bg-success');
-                            statusBadge.textContent = '{{ __('users.status.active') }}';
-                        } else {
-                            statusBadge.classList.remove('bg-success');
-                            statusBadge.classList.add('bg-secondary');
-                            statusBadge.textContent = '{{ __('users.status.inactive') }}';
-                        }
-                        
-                        // عرض رسالة نجاح
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                        alertDiv.innerHTML = `
-                            ${data.message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        `;
-                        document.querySelector('.card-header').appendChild(alertDiv);
-                        
-                        // إخفاء الرسالة بعد 3 ثواني
-                        setTimeout(() => {
-                            alertDiv.remove();
-                        }, 3000);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+    document.querySelectorAll('.toggle-status').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.dataset.userId;
+            const currentStatus = this.dataset.status;
+            
+            fetch(`/admin/users/${userId}/toggle-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update button appearance
+                    this.classList.toggle('btn-secondary');
+                    this.classList.toggle('btn-success');
+                    
+                    // Update icon
+                    const icon = this.querySelector('i');
+                    icon.classList.toggle('fa-ban');
+                    icon.classList.toggle('fa-check');
+                    
+                    // Update status badge
+                    const statusBadge = this.closest('tr').querySelector('.badge');
+                    statusBadge.classList.toggle('bg-success');
+                    statusBadge.classList.toggle('bg-danger');
+                    statusBadge.textContent = currentStatus == 1 
+                        ? '{{ __("users.status.inactive") }}'
+                        : '{{ __("users.status.active") }}';
+                    
+                    // Update data attribute
+                    this.dataset.status = currentStatus == 1 ? '0' : '1';
+                    
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ __("common.success") }}',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: '{{ __("common.error") }}',
+                    text: '{{ __("common.something_went_wrong") }}'
                 });
             });
         });

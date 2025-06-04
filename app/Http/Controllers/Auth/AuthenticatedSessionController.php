@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -42,8 +43,8 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        // Always redirect to intended route or dashboard
-        return redirect()->intended(route('dashboard'))
+        // Always redirect to intended route or admin dashboard
+        return redirect()->intended(route('admin.dashboard'))
             ->with('status', trans('auth.messages.welcome', ['name' => $user->name]));
     }
 
