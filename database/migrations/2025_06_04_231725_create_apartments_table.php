@@ -18,6 +18,15 @@ return new class extends Migration
             $table->string('name');
             $table->integer('floor_number');
             $table->decimal('cost', 10, 2); // تكلفة الشقة
+
+            // معلومات المستفيد
+            $table->string('beneficiary_name_ar')->nullable(); // اسم المستفيد بالعربي
+            $table->string('beneficiary_name_en')->nullable(); // اسم المستفيد بالإنجليزي
+            $table->string('beneficiary_id')->nullable(); // رقم هوية المستفيد
+            $table->string('beneficiary_mobile')->nullable(); // رقم جوال المستفيد
+            $table->string('beneficiary_email')->nullable(); // البريد الإلكتروني للمستفيد
+            $table->enum('beneficiary_type', ['owner', 'tenant'])->nullable(); // نوع المستفيد (مالك/مستأجر)
+            
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->timestamps();
@@ -28,6 +37,8 @@ return new class extends Migration
             $table->index('apartment_type_id');
             $table->index('floor_number');
             $table->index(['tower_id', 'floor_number']); // للبحث عن الشقق في طابق معين في برج معين
+            $table->index('beneficiary_id'); // للبحث عن طريق رقم هوية المستفيد
+            $table->index('beneficiary_type'); // للبحث حسب نوع المستفيد
         });
     }
 

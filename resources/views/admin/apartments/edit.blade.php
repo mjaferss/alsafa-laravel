@@ -74,6 +74,69 @@
                             @enderror
                         </div>
                     </div>
+
+                    <!-- بيانات المستفيد -->
+                    <div class="col-12 mt-4">
+                        <h6 class="mb-3">{{ __('apartments.beneficiary_info') }}</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="beneficiary_type" class="form-control-label">{{ __('apartments.fields.beneficiary_type') }}</label>
+                            <select class="form-select @error('beneficiary_type') is-invalid @enderror" name="beneficiary_type" id="beneficiary_type">
+                                <option value="">{{ __('apartments.select_beneficiary_type') }}</option>
+                                <option value="owner" {{ old('beneficiary_type', $apartment->beneficiary_type) == 'owner' ? 'selected' : '' }}>{{ __('apartments.beneficiary_types.owner') }}</option>
+                                <option value="tenant" {{ old('beneficiary_type', $apartment->beneficiary_type) == 'tenant' ? 'selected' : '' }}>{{ __('apartments.beneficiary_types.tenant') }}</option>
+                            </select>
+                            @error('beneficiary_type')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="beneficiary_id" class="form-control-label">{{ __('apartments.fields.beneficiary_id') }}</label>
+                            <input class="form-control @error('beneficiary_id') is-invalid @enderror" type="text" name="beneficiary_id" id="beneficiary_id" value="{{ old('beneficiary_id', $apartment->beneficiary_id) }}">
+                            @error('beneficiary_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="beneficiary_name_ar" class="form-control-label">{{ __('apartments.fields.beneficiary_name_ar') }}</label>
+                            <input class="form-control @error('beneficiary_name_ar') is-invalid @enderror" type="text" name="beneficiary_name_ar" id="beneficiary_name_ar" value="{{ old('beneficiary_name_ar', $apartment->beneficiary_name_ar) }}">
+                            @error('beneficiary_name_ar')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="beneficiary_name_en" class="form-control-label">{{ __('apartments.fields.beneficiary_name_en') }}</label>
+                            <input class="form-control @error('beneficiary_name_en') is-invalid @enderror" type="text" name="beneficiary_name_en" id="beneficiary_name_en" value="{{ old('beneficiary_name_en', $apartment->beneficiary_name_en) }}">
+                            @error('beneficiary_name_en')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="beneficiary_mobile" class="form-control-label">{{ __('apartments.fields.beneficiary_mobile') }}</label>
+                            <input class="form-control @error('beneficiary_mobile') is-invalid @enderror" type="text" name="beneficiary_mobile" id="beneficiary_mobile" value="{{ old('beneficiary_mobile', $apartment->beneficiary_mobile) }}">
+                            @error('beneficiary_mobile')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="beneficiary_email" class="form-control-label">{{ __('apartments.fields.beneficiary_email') }}</label>
+                            <input class="form-control @error('beneficiary_email') is-invalid @enderror" type="email" name="beneficiary_email" id="beneficiary_email" value="{{ old('beneficiary_email', $apartment->beneficiary_email) }}">
+                            @error('beneficiary_email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
                 <div class="d-flex justify-content-end mt-4">
                     <a href="{{ route('admin.apartments.index') }}" class="btn btn-light m-0 me-2">{{ __('common.cancel') }}</a>

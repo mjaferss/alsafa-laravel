@@ -112,10 +112,10 @@
                             </td>
                             <td class="align-middle text-center text-sm">
                                 <div class="dropdown">
-                                    <button class="btn btn-sm btn-icon-only text-dark mb-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v"></i>
+                                    <button class="btn btn-link text-secondary mb-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa fa-ellipsis-v text-xs"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
+                                    <ul class="dropdown-menu dropdown-menu-end" style="position: absolute; z-index: 1000;">
                                         <li>
                                             <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewApartmentModal{{ $apartment->id }}">
                                                 <i class="fas fa-eye me-2"></i> {{ __('apartments.actions.view') }}
@@ -128,7 +128,7 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <form action="{{ route('admin.apartments.destroy', $apartment) }}" method="POST" class="d-inline">
+                                                <form action="{{ route('admin.apartments.destroy', $apartment) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="dropdown-item" onclick="return confirm('{{ __('apartments.confirmations.delete') }}')">
@@ -193,6 +193,53 @@
                                                         <p class="form-control-static">{{ $apartment->created_at->format('Y-m-d H:i') }}</p>
                                                     </div>
                                                 </div>
+
+                                                <!-- بيانات المستفيد -->
+                                                <div class="col-12 mt-4">
+                                                    <h6 class="mb-3">{{ __('apartments.beneficiary_info') }}</h6>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">{{ __('apartments.fields.beneficiary_type') }}</label>
+                                                        <p class="form-control-static">
+                                                            @if($apartment->beneficiary_type)
+                                                                {{ __('apartments.beneficiary_types.' . $apartment->beneficiary_type) }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">{{ __('apartments.fields.beneficiary_id') }}</label>
+                                                        <p class="form-control-static">{{ $apartment->beneficiary_id ?? '-' }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">{{ __('apartments.fields.beneficiary_name_ar') }}</label>
+                                                        <p class="form-control-static">{{ $apartment->beneficiary_name_ar ?? '-' }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">{{ __('apartments.fields.beneficiary_name_en') }}</label>
+                                                        <p class="form-control-static">{{ $apartment->beneficiary_name_en ?? '-' }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">{{ __('apartments.fields.beneficiary_mobile') }}</label>
+                                                        <p class="form-control-static">{{ $apartment->beneficiary_mobile ?? '-' }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">{{ __('apartments.fields.beneficiary_email') }}</label>
+                                                        <p class="form-control-static">{{ $apartment->beneficiary_email ?? '-' }}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -211,11 +258,31 @@
                         @endforelse
                     </tbody>
                 </table>
+                @if($apartments->hasPages())
                 <div class="d-flex justify-content-center mt-4">
                     {{ $apartments->appends(request()->query())->links('vendor.pagination.bootstrap-5') }}
                 </div>
+                @endif
             </div>
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+    .dropdown-menu {
+        min-width: 10rem;
+        max-width: none;
+        transform: none !important;
+        left: auto !important;
+        right: 0 !important;
+        top: 100% !important;
+        margin-top: 0.125rem !important;
+    }
+    .table-responsive {
+        overflow: visible !important;
+    }
+</style>
+@endpush
+
 @endsection 

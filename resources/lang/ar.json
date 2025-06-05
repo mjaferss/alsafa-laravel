@@ -179,7 +179,6 @@
     "towers.list": "قائمة الأبراج",
     "towers.list_title": "قائمة الأبراج",
     "towers.add_new": "إضافة برج جديد",
-    "towers.edit": "تعديل البرج",
     "towers.edit_title": "تعديل بيانات البرج",
     "towers.details": "تفاصيل البرج",
     "towers.fields.name": "الاسم",
@@ -300,5 +299,16 @@
     "apartments.select_tower": "اختر البرج",
     "apartments.select_type": "اختر نوع الشقة",
     "apartments.title": "الشقق",
-    "apartment_types.title": "أنواع الشقق"
+    "apartment_types.title": "أنواع الشقق",
+    "towers.basic_info": "المعلومات الأساسية",
+    "apartments.beneficiary_info": "بيانات المستفيد",
+    "apartments.fields.beneficiary_type": "نوع المستفيد",
+    "apartments.fields.beneficiary_id": "رقم هوية المستفيد",
+    "apartments.fields.beneficiary_name_ar": "اسم المستفيد بالعربية",
+    "apartments.fields.beneficiary_name_en": "اسم المستفيد بالإنجليزية",
+    "apartments.fields.beneficiary_mobile": "رقم جوال المستفيد",
+    "apartments.fields.beneficiary_email": "البريد الإلكتروني للمستفيد",
+    "apartments.select_beneficiary_type": "اختر نوع المستفيد",
+    "apartments.beneficiary_types.owner": "مالك",
+    "apartments.beneficiary_types.tenant": "مستأجر"
 }
