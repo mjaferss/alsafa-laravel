@@ -4,7 +4,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\Admin\SectionController;
-use App\Http\Controllers\TowerController;
+use App\Http\Controllers\Admin\ApartmentController;
+use App\Http\Controllers\Admin\ApartmentTypeController;
+use App\Http\Controllers\Admin\TowerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
@@ -42,19 +44,37 @@ Route::middleware(['auth', 'role:super_admin,manager'])->prefix('admin')->name('
     Route::resource('branches', BranchController::class);
     Route::post('branches/{branch}/toggle-status', [BranchController::class, 'toggleStatus'])->name('branches.toggle-status');
     
-    // Towers routes
-    Route::resource('towers', TowerController::class);
-    Route::post('towers/{tower}/toggle-status', [TowerController::class, 'toggleStatus'])->name('towers.toggle-status');
-    
     // Sections routes
     Route::resource('sections', SectionController::class);
     Route::post('sections/{section}/toggle-status', [SectionController::class, 'toggleStatus'])->name('sections.toggle-status');
+    
+    // Apartment Types routes
+    Route::resource('apartment-types', ApartmentTypeController::class);
+    Route::post('apartment-types/{apartmentType}/toggle-status', [ApartmentTypeController::class, 'toggleStatus'])->name('apartment-types.toggle-status');
+    
+    // Apartments routes
+    Route::resource('apartments', ApartmentController::class);
     
     // Maintenance requests routes
     Route::resource('maintenance-requests', 'App\Http\Controllers\MaintenanceRequestController');
     
     // Activities routes
     Route::get('/activities', 'App\Http\Controllers\ActivityController@index')->name('activities.index');
+
+    // Towers routes
+    Route::prefix('towers')->name('towers.')->group(function () {
+        Route::get('/', [TowerController::class, 'index'])->name('index');
+        Route::get('/create', [TowerController::class, 'create'])->name('create');
+        Route::post('/', [TowerController::class, 'store'])->name('store');
+        Route::get('/{tower}/edit', [TowerController::class, 'edit'])->name('edit');
+        Route::put('/{tower}', [TowerController::class, 'update'])->name('update');
+        Route::delete('/{tower}', [TowerController::class, 'destroy'])->name('destroy');
+        Route::post('/{tower}/toggle-status', [TowerController::class, 'toggleStatus'])->name('toggle-status');
+        
+        // Add apartment from tower routes
+        Route::get('/{tower}/create-apartment', [TowerController::class, 'createApartment'])->name('create-apartment');
+        Route::post('/{tower}/store-apartment', [TowerController::class, 'storeApartment'])->name('store-apartment');
+    });
 });
 
 // Profile routes

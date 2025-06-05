@@ -29,7 +29,7 @@ class CheckRole
 
         // Check if user has any of the required roles
         if (!in_array($request->user()->role, $roles)) {
-            return redirect()->route('home')->with('error', __('auth.unauthorized'));
+            return redirect()->route('admin.dashboard')->with('error', __('auth.unauthorized'));
         }
 
         return $next($request);

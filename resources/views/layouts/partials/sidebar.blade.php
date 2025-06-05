@@ -46,6 +46,31 @@
                 </a>
             </li>
 
+            <!-- Apartments Section -->
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('admin/apartments*') || request()->is('admin/apartment-types*') ? 'active' : '' }}" href="#" data-bs-toggle="collapse" data-bs-target="#apartmentsCollapse" aria-expanded="{{ request()->is('admin/apartments*') || request()->is('admin/apartment-types*') ? 'true' : 'false' }}" aria-controls="apartmentsCollapse">
+                    <i class="fas fa-building"></i>
+                    <span>{{ __('menu.apartments') }}</span>
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse {{ request()->is('admin/apartments*') || request()->is('admin/apartment-types*') ? 'show' : '' }}" id="apartmentsCollapse">
+                    <ul class="nav flex-column ms-3">
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('admin/apartment-types*') ? 'active' : '' }}" href="{{ route('admin.apartment-types.index') }}">
+                                <i class="fas fa-tags"></i>
+                                <span>{{ __('menu.apartment_types') }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('admin/apartments*') ? 'active' : '' }}" href="{{ route('admin.apartments.index') }}">
+                                <i class="fas fa-list"></i>
+                                <span>{{ __('menu.apartment_list') }}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
             <!-- Departments Section -->
             <li class="nav-item">
                 <a class="nav-link {{ request()->is('admin/sections*') ? 'active' : '' }}" href="{{ route('admin.sections.index') }}">
@@ -104,3 +129,38 @@
         </div>
     </div>
 </nav>
+
+<style>
+/* Submenu styles */
+.nav-link[data-bs-toggle="collapse"] {
+    position: relative;
+}
+
+.nav-link[data-bs-toggle="collapse"] .fa-chevron-down {
+    transition: transform 0.3s ease;
+    font-size: 0.75rem;
+}
+
+.nav-link[aria-expanded="true"] .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.collapse .nav-link {
+    padding-left: 2.5rem;
+}
+
+[dir="rtl"] .collapse .nav-link {
+    padding-left: 1rem;
+    padding-right: 2.5rem;
+}
+
+.collapse .nav-link i {
+    font-size: 0.875rem;
+}
+
+/* RTL support for submenu chevron */
+[dir="rtl"] .nav-link[data-bs-toggle="collapse"] .fa-chevron-down {
+    margin-left: 0;
+    margin-right: auto;
+}
+</style>
