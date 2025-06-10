@@ -1,4 +1,4 @@
-@extends('layouts.admin_new')
+@extends('layouts.admin')
 
 @section('title', __('sections.add_new'))
 
@@ -55,8 +55,8 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-end mt-4">
-                    <a href="{{ route('admin.sections.index') }}" class="btn btn-light m-0 me-2">{{ __('common.cancel') }}</a>
-                    <button type="submit" class="btn btn-primary m-0">{{ __('common.save') }}</button>
+                    <a href="{{ route('admin.sections.index') }}" class="btn bg-gradient-secondary m-0 me-2">{{ __('common.cancel') }}</a>
+                    <button type="submit" class="btn bg-gradient-primary m-0">{{ __('common.save') }}</button>
                 </div>
             </form>
         </div>

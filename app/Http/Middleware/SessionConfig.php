@@ -10,9 +10,10 @@ class SessionConfig
     public function handle(Request $request, Closure $next)
     {
         config([
-            'session.same_site' => null,
-            'session.secure' => false,
-            'session.domain' => null,
+            'session.same_site' => 'lax',
+            'session.secure' => env('SESSION_SECURE_COOKIE', false),
+            'session.domain' => env('SESSION_DOMAIN', null),
+            'session.http_only' => true,
         ]);
 
         return $next($request);

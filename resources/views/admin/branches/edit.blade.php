@@ -1,4 +1,4 @@
-@extends('layouts.admin_new')
+@extends('layouts.admin')
 
 @section('title', __('branches.edit'))
 
@@ -8,13 +8,27 @@
         <div class="card-header pb-0">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">{{ __('branches.edit') }}: {{ app()->getLocale() == 'ar' ? $branch->name_ar : $branch->name_en }}</h5>
-                <a href="{{ route('branches.index') }}" class="btn btn-secondary btn-sm">
+                <a href="{{ route('admin.branches.index') }}" class="btn bg-gradient-secondary btn-sm mb-0">
                     <i class="fas fa-arrow-left me-2"></i> {{ __('common.back') }}
                 </a>
             </div>
         </div>
         <div class="card-body">
-            <form action="{{ route('branches.update', $branch) }}" method="POST">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            <form action="{{ route('admin.branches.update', $branch) }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="row">
@@ -67,7 +81,15 @@
                             @enderror
                         </div>
                     </div>
-
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email" class="form-control-label">{{ __('branches.fields.email') }}</label>
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $branch->email) }}" required>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
@@ -80,11 +102,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mt-4">
-                    <div class="col-md-12 text-end">
-                        <button type="submit" class="btn btn-primary">{{ __('common.save') }}</button>
-                        <a href="{{ route('branches.index') }}" class="btn btn-secondary">{{ __('common.cancel') }}</a>
-                    </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="{{ route('admin.branches.index') }}" class="btn bg-gradient-secondary m-0 me-2">{{ __('common.cancel') }}</a>
+                    <button type="submit" class="btn bg-gradient-primary m-0">{{ __('common.save') }}</button>
                 </div>
             </form>
         </div>

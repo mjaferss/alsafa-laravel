@@ -10,159 +10,200 @@ This document provides a comprehensive map of the project structure, explaining 
 alsafa/
 ├── app/                    # Application core code
 │   ├── Http/              # HTTP layer (Controllers, Middleware, etc.)
+│   │   ├── Controllers/   # Application controllers
+│   │   └── Middleware/    # Custom middleware
 │   ├── Models/            # Database models
 │   └── Traits/            # Reusable traits
 ├── config/                # Configuration files
 ├── database/             # Database migrations and seeders
+│   ├── migrations/       # Database structure
+│   └── seeders/         # Initial data
 ├── public/               # Publicly accessible files
 │   ├── css/             # Compiled CSS files
 │   ├── js/              # Compiled JavaScript files
 │   └── images/          # Image assets
-└── resources/           # Raw resources
-    ├── views/           # Blade templates
-    └── lang/            # Language files
+├── resources/           # Raw resources
+│   ├── views/           # Blade templates
+│   ├── js/              # Source JavaScript
+│   ├── css/             # Source CSS/SCSS
+│   └── lang/            # Language files
+└── routes/              # Route definitions
+    ├── web.php          # Web routes
+    └── api.php          # API routes
 ```
+
+## 🚫 Duplicate Files Found
+1. Language Files (يجب توحيدها):
+   - `/lang/ar/` و `/resources/lang/ar/`
+   - `/lang/en/` و `/resources/lang/en/`
+   - يجب نقل جميع ملفات الترجمة إلى `/resources/lang/`
+
+2. Views (يجب توحيدها):
+   - بعض الملفات في `/resources/views/` مكررة مع أسماء مختلفة
+   - يجب توحيد التسميات واتباع نمط موحد
 
 ## 📊 Implementation Progress
 
 ### ✅ Completed Modules
-1. **Users Management (إدارة المستخدمين)** - 100% Complete
-   - Full CRUD operations
-   - Role-based access control
-   - Status management (active/inactive)
-   - Multilingual support
+1. **Authentication & Authorization**
+   - Login/Register system ✅
+   - Role-based access control ✅
+   - Session management ✅
+   - Password reset ✅
 
-2. **Branches Management (إدارة الفروع)** - 100% Complete
-   - Full CRUD operations
-   - Status management (active/inactive)
-   - Multilingual support (names and addresses in Arabic and English)
-   - Role-based access control
+2. **Users Management (إدارة المستخدمين)**
+   - CRUD operations ✅
+   - Role management ✅
+   - Activity logging ✅
+   - Profile management ✅
 
-3. **Towers Management (إدارة الأبراج)** - 80% Complete
-   - Basic CRUD operations ✅
-   - Multilingual support (Arabic/English) ✅
-   - Status management ✅
-   - Apartment creation from tower view ✅
-   - Cost management with approval system ✅
-   - Remaining: Advanced reporting and statistics
+3. **Branches Management (إدارة الفروع)**
+   - CRUD operations ✅
+   - Location management ✅
+   - Staff assignment ✅
+   - Status tracking ✅
 
-### ⏳ Pending Modules
-1. **Departments Management (إدارة الأقسام الرئيسية)** - 0% Complete
-   - Structure created but implementation pending
+4. **Towers Management (إدارة الأبراج)**
+   - CRUD operations ✅
+   - Apartment management ✅
+   - Cost tracking ✅
+   - Status updates ✅
 
-2. **Maintenance Requests (طلبات الصيانة)** - 0% Complete
-   - Structure created but implementation pending
+### ⚠️ Partially Complete
+1. **Apartments Management (إدارة الشقق)** - 70%
+   - Basic CRUD ✅
+   - Type management ✅
+   - Cost tracking ✅
+   - Pending: Maintenance integration ⏳
+   - Pending: Advanced reporting ⏳
 
-3. **Apartments Management (إدارة الشقق)** - 50% Complete
-   - Basic structure implemented ✅
-   - Creation from tower view ✅
-   - Multilingual support ✅
-   - Pending: Cost management, maintenance integration
+2. **Maintenance System (نظام الصيانة)** - 40%
+   - Request creation ✅
+   - Basic tracking ✅
+   - Pending: Workflow management ⏳
+   - Pending: Cost management ⏳
+   - Pending: Reporting system ⏳
 
-### 📝 Views Structure
+### ⏳ Pending Implementation
+1. **Departments Management (إدارة الأقسام)**
+2. **Reports & Analytics (التقارير والإحصائيات)**
+3. **Notification System (نظام الإشعارات)**
+
+## 📁 Views Structure
 ```
 resources/views/
-├── admin/               # Admin panel views
-│   ├── users/                  # User management ✅
-│   │   ├── index.blade.php     # List all users ✅
-│   │   ├── create.blade.php    # Create new user ✅
-│   │   └── edit.blade.php      # Edit existing user ✅
-│   ├── branches/               # Branch management ✅
-│   │   ├── index.blade.php     # List all branches ✅
-│   │   ├── create.blade.php    # Create new branch ✅
-│   │   └── edit.blade.php      # Edit existing branch ✅
-│   ├── departments/            # Department management ⏳
-│   │   ├── index.blade.php     # List all departments ⏳
-│   │   ├── create.blade.php    # Create new department ⏳
-│   │   └── edit.blade.php      # Edit existing department ⏳
-│   ├── towers/                 # Tower management ✅
-│   │   ├── index.blade.php     # List all towers ✅
-│   │   ├── create.blade.php    # Create new tower ✅
-│   │   ├── edit.blade.php      # Edit existing tower ✅
-│   │   └── show.blade.php      # Show tower details ✅
-│   ├── apartments/             # Apartment management ⏳
-│   │   ├── index.blade.php     # List all apartments ✅
-│   │   ├── create.blade.php    # Create new apartment ✅
-│   │   └── edit.blade.php      # Edit existing apartment ⏳
-│   └── maintenance/            # Maintenance requests ⏳
-│       ├── index.blade.php     # List all maintenance requests ⏳
-│       ├── create.blade.php    # Create new maintenance request ⏳
-│       └── edit.blade.php      # Edit existing maintenance request ⏳
-├── auth/                # Authentication views ✅
-│   ├── login.blade.php         # Login page ✅
-│   └── register.blade.php      # Registration page ✅
-├── layouts/             # Layout templates ✅
-│   ├── admin_new.blade.php     # Admin panel layout ✅
-│   ├── guest.blade.php         # Guest/public layout ✅
-│   └── partials/              # Layout partials ⏳
-│       ├── head.blade.php      # Head section with meta tags and CSS ⏳
-│       ├── sidebar.blade.php    # Admin sidebar navigation ⏳
-│       ├── navbar.blade.php     # Top navigation bar ⏳
-│       └── scripts.blade.php    # JavaScript includes and scripts ⏳
-├── components/          # Reusable components ✅
-└── pagination/          # Pagination templates ✅
-    └── bootstrap-5.blade.php   # Bootstrap 5 pagination template ✅
+├── admin/                     # Admin panel views
+│   ├── dashboard/            # Dashboard views
+│   ├── users/               # User management
+│   ├── branches/            # Branch management
+│   ├── towers/             # Tower management
+│   ├── apartments/         # Apartment management
+│   ├── maintenance/        # Maintenance management
+│   └── departments/        # Department management
+├── auth/                     # Authentication views
+├── layouts/                  # Layout templates
+│   ├── admin_new.blade.php   # Admin layout
+│   ├── guest.blade.php       # Guest layout
+│   └── partials/            # Shared partials
+│       ├── navbar.blade.php
+│       ├── sidebar.blade.php
+│       ├── footer.blade.php
+│       └── scripts.blade.php
+├── components/               # Reusable components
+└── errors/                   # Error pages
 ```
 
-### 🌍 Language Files Structure
+## 🌍 Language Structure
 ```
-resources/lang/
-├── ar.json              # Arabic translations in JSON format ✅
-├── en.json              # English translations in JSON format ✅
+resources/lang/               # Centralized translations
+├── ar/                      # Arabic translations
+│   ├── auth.php
+│   ├── validation.php
+│   └── [module].php
+├── en/                      # English translations
+│   ├── auth.php
+│   ├── validation.php
+│   └── [module].php
+├── ar.json                  # Arabic JSON translations
+└── en.json                  # English JSON translations
 ```
 
-## 🔑 Key Files and Their Purposes
+## 🔑 Key Components
 
 ### Controllers
-- `DashboardController.php`: Manages the admin dashboard view and statistics ✅
-- `LanguageController.php`: Handles language switching functionality ✅
-- `UserController.php`: Manages user CRUD operations ✅
-- `BranchController.php`: Manages branch CRUD operations ✅
-- `DepartmentController.php`: Manages department CRUD operations ⏳
-- `TowerController.php`: Manages tower CRUD operations ✅
-- `MaintenanceController.php`: Manages maintenance request CRUD operations ⏳
-- `ApartmentController.php`: Manages apartment CRUD operations ✅
-- `ApartmentTypeController.php`: Manages apartment types ✅
+```
+app/Http/Controllers/
+├── Admin/                   # Admin controllers
+│   ├── DashboardController.php
+│   ├── UserController.php
+│   ├── BranchController.php
+│   ├── TowerController.php
+│   ├── ApartmentController.php
+│   └── MaintenanceController.php
+├── Auth/                    # Auth controllers
+└── API/                     # API controllers
+```
 
 ### Models
-- `User.php`: User model with authentication and role management ✅
-- `Activity.php`: Logs user activities and changes ✅
-- `Branch.php`: Manages branch information ✅
-- `Department.php`: Manages department information ⏳
-- `Tower.php`: Manages tower information ✅
-- `Maintenance.php`: Manages maintenance request information ⏳
-- `Apartment.php`: Manages apartment information ✅
-- `ApartmentType.php`: Manages apartment type information ✅
+```
+app/Models/
+├── User.php
+├── Branch.php
+├── Tower.php
+├── Apartment.php
+├── Maintenance.php
+└── Activity.php
+```
 
-### Layouts
-- `admin_new.blade.php`: Main layout for authenticated users with: ✅
-  - Fixed header
-  - Collapsible sidebar
-  - Content area
-  - Language switcher
-- `guest.blade.php`: Public layout with: ✅
-  - Navigation bar
-  - Language switcher
-  - Content area
-  - Footer
-- `partials/`: Layout components for better organization: ⏳
-  - `head.blade.php`: Meta tags, CSS links, and other head elements
-  - `sidebar.blade.php`: Admin sidebar with navigation menu
-  - `navbar.blade.php`: Top navigation bar with user menu
-  - `scripts.blade.php`: JavaScript files and inline scripts
-
-## 🔧 Configuration
-Important configuration files that should not be duplicated:
-- `config/app.php`: Application configuration ✅
-- `config/auth.php`: Authentication configuration ✅
-- `config/database.php`: Database configuration ✅
+### Middleware
+```
+app/Http/Middleware/
+├── Authenticate.php
+├── CheckRole.php
+├── SetLocale.php
+└── SessionConfig.php
+```
 
 ## 📋 Development Guidelines
-1. All new features should follow this structure
-2. Language files should be kept in sync between Arabic and English
-3. Use the existing layouts instead of creating new ones
-4. Follow the established naming conventions
-5. Use the LogsActivity trait for models that need activity tracking
-6. Implement role-based access control for all new modules
-7. Ensure all views are responsive and work on mobile devices
-8. Maintain multilingual support for all user-facing content
+
+### 1. File Organization
+- Use consistent naming conventions
+- Keep related files together
+- Follow Laravel's directory structure
+
+### 2. Code Standards
+- Follow PSR-12 coding standards
+- Use type hints and return types
+- Document complex logic
+- Write unit tests for critical features
+
+### 3. Multilingual Support
+- All user-facing text must be translatable
+- Use translation keys instead of hardcoded text
+- Keep translations organized by module
+- Maintain both Arabic and English versions
+
+### 4. Security
+- Implement proper authentication
+- Use role-based access control
+- Validate all user input
+- Protect sensitive routes
+- Log important activities
+
+### 5. Performance
+- Cache frequently accessed data
+- Optimize database queries
+- Use lazy loading where appropriate
+- Minimize asset sizes
+
+### 6. UI/UX
+- Maintain consistent design
+- Ensure mobile responsiveness
+- Follow accessibility guidelines
+- Provide clear feedback to users
+
+### 7. Testing
+- Write unit tests for models
+- Test critical workflows
+- Validate form submissions
+- Check authorization rules

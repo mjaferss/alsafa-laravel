@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}" class="h-100">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ app()->getLocale() == 'ar' ? 'الصفا' : 'AlSafa' }}</title>
+    <title>{{ config('app.name', 'AlSafa') }} - @yield('title')</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,82 +22,92 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
+
     <!-- Custom CSS -->
     <style>
         :root {
+            --sidebar-width: 280px;
+            --sidebar-mini-width: 70px;
             --primary-color: #0d6efd;
             --primary-gradient: linear-gradient(135deg, #0d6efd, #0099ff);
-            --sidebar-width: 280px;
-            --sidebar-collapsed-width: 70px;
             --header-height: 65px;
-            --footer-height: 60px;
             --transition-speed: 0.3s;
         }
         
-        /* Fix sidebar visibility */
-        #sidenav-main {
-            display: block !important;
-            visibility: visible !important;
-            z-index: 1030;
-        }
-                        body {
+        body {
             font-family: 'Cairo', sans-serif;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
             background-color: #f8f9fa;
-            padding-top: var(--header-height);
             overflow-x: hidden;
+            padding-top: var(--header-height);
         }
         
         /* Sidebar Styles */
         .sidenav {
             width: var(--sidebar-width);
-            height: 100vh;
+            height: calc(100vh - var(--header-height));
             position: fixed;
-            top: 0;
+            top: var(--header-height);
             left: 0;
             background: white;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            transition: all var(--transition-speed) ease;
             z-index: 1040;
-            padding-top: var(--header-height);
+            overflow-y: auto;
+        }
+
+        [dir="rtl"] .sidenav {
+            left: auto;
+            right: 0;
         }
 
         .sidenav.collapsed {
             width: var(--sidebar-mini-width);
         }
 
-        .sidenav .nav-item {
-            width: 100%;
-            margin-bottom: 5px;
+        .sidenav-header {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
         }
 
         .sidenav .nav-link {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
+            padding: 0.75rem 1rem;
             color: #344767;
-            border-radius: 10px;
-            margin: 0 15px;
-            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            margin: 0.5rem 1rem;
+            transition: all var(--transition-speed) ease;
+            white-space: nowrap;
         }
 
         .sidenav .nav-link i {
+            min-width: 32px;
             font-size: 1.2rem;
-            margin-right: 10px;
-            width: 25px;
+            margin-right: 0.75rem;
             text-align: center;
-            transition: margin 0.3s ease;
+            transition: margin var(--transition-speed) ease;
         }
 
-        .sidenav .nav-link span {
-            transition: opacity 0.3s ease;
+        [dir="rtl"] .sidenav .nav-link i {
+            margin-right: 0;
+            margin-left: 0.75rem;
         }
 
-        .sidenav.collapsed .nav-link span {
+        .sidenav .nav-link-text {
+            opacity: 1;
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        .sidenav.collapsed .nav-link-text {
             opacity: 0;
             width: 0;
+            display: none;
         }
 
         .sidenav .nav-link:hover,
@@ -107,430 +117,378 @@
             box-shadow: 0 4px 6px rgba(13, 110, 253, 0.1);
         }
 
-        .sidenav .nav-link:hover i,
-        .sidenav .nav-link.active i {
-            color: white;
-        }
-
-        .sidenav-header {
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 15px;
-        }
-
-        .sidenav.collapsed .sidenav-header span {
-            display: none;
-        }
-                .navbar {
-            height: var(--header-height);
-            background: var(--primary-gradient);
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-            padding: 0.5rem 1.5rem;
-        }
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: white;
-        }
-        .navbar-brand:hover {
-            color: rgba(255, 255, 255, 0.9);
-        }
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: all var(--transition-speed) ease;
-        }
-        .nav-link:hover {
-            color: white !important;
-            background: rgba(255, 255, 255, 0.1);
-        }
-                .wrapper {
-            flex: 1;
-            display: flex;
-            min-height: calc(100vh - var(--header-height) - var(--footer-height));
-        }
-                .sidenav {
-            width: var(--sidebar-width);
-            background: white;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            transition: all var(--transition-speed) ease;
-            padding: 1.5rem 1rem;
-            position: fixed;
-            top: var(--header-height);
-            bottom: var(--footer-height);
-            overflow-y: auto;
-            z-index: 1000;
-        }
-        .sidenav::-webkit-scrollbar {
-            width: 6px;
-        }
-        .sidenav::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .sidenav::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 3px;
-        }
-        .sidenav .nav-link {
-            color: #444 !important;
-            padding: 0.75rem 1rem;
-            margin-bottom: 0.5rem;
-            border-radius: 0.375rem;
-            display: flex;
-            align-items: center;
-            transition: all var(--transition-speed) ease;
-        }
-        .sidenav .nav-link i {
-            font-size: 1.1rem;
-            margin-right: 1rem;
-            width: 1.5rem;
-            text-align: center;
-            color: #666;
-            transition: all var(--transition-speed) ease;
-        }
-        .sidenav .nav-link:hover {
-            color: var(--primary-color) !important;
-            background: rgba(13, 110, 253, 0.1);
-        }
-        .sidenav .nav-link:hover i {
-            color: var(--primary-color);
-        }
-        .sidenav .nav-link.active {
-            color: white !important;
-            background: var(--primary-gradient);
-        }
-        .sidenav .nav-link.active i {
-            color: white;
-        }
-        .sidenav.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-        .sidenav.collapsed .nav-link-text,
-        .sidenav.collapsed .sidenav-header span {
-            display: none;
-        }
-                .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-            transition: all var(--transition-speed) ease;
-        }
-        .main-content .page-header {
-            margin-bottom: 2rem;
-        }
-        .main-content .page-title {
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0;
-        }
-        .card {
-            border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-            margin-bottom: 1.5rem;
-        }
-        .card-header {
-            background: white;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 1rem 1.5rem;
-        }
-        .card-body {
-            padding: 1.5rem;
-        }
-                .footer {
-            height: var(--footer-height);
-            background: white;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 1rem 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-            font-size: 0.9rem;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-        
-        /* RTL Specific Styles */
-        [dir="rtl"] .sidenav {
-            right: 0;
-            left: auto;
-        }
-        [dir="rtl"] .main-content {
-            margin-right: var(--sidebar-width);
-            margin-left: 0;
-        }
-        [dir="rtl"] .sidenav .nav-link i {
-            margin-right: 0;
-            margin-left: 1rem;
-        }
-        
-        /* Responsive Styles */
-        @media (max-width: 992px) {
-            .sidenav {
-                transform: translateX(-100%);
-            }
-            [dir="rtl"] .sidenav {
-                transform: translateX(100%);
-            }
-            .sidenav.show {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-            }
-        }
-        [dir="rtl"] .sidenav {
-            right: 0;
-            left: auto;
-        }
-        [dir="rtl"] .main-content {
-            margin-right: var(--sidebar-width);
-            margin-left: 0;
-        }
-        [dir="rtl"] .collapsed ~ .main-content {
-            margin-right: var(--sidebar-collapsed-width);
-            margin-left: 0;
-        }
         .toggle-sidebar {
             cursor: pointer;
-            padding: 0.5rem;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: transparent;
             border: none;
             color: #6c757d;
-            position: absolute;
-            right: 1rem;
-            top: 1rem;
+            transition: all var(--transition-speed) ease;
+            border-radius: 50%;
         }
-        [dir="rtl"] .toggle-sidebar {
-            right: auto;
-            left: 1rem;
+
+        .toggle-sidebar:hover {
+            background: rgba(108, 117, 125, 0.1);
         }
+
+        .toggle-sidebar i {
+            font-size: 1.25rem;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: margin var(--transition-speed) ease;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        [dir="rtl"] .main-content {
+            margin-left: 0;
+            margin-right: var(--sidebar-width);
+        }
+
+        .collapsed ~ .main-content {
+            margin-left: var(--sidebar-mini-width);
+        }
+
+        [dir="rtl"] .collapsed ~ .main-content {
+            margin-left: 0;
+            margin-right: var(--sidebar-mini-width);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .sidenav {
+                transform: translateX(-100%);
+            }
+
+            [dir="rtl"] .sidenav {
+                transform: translateX(100%);
+            }
+
+            .sidenav.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            .toggle-sidebar {
+                display: none;
+            }
+        }
+
+        /* Alert Styles */
+        .alert {
+            border: none;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: rgba(40, 199, 111, 0.1);
+            color: #28c76f;
+        }
+
+        .alert-danger {
+            background-color: rgba(234, 84, 85, 0.1);
+            color: #ea5455;
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 159, 67, 0.1);
+            color: #ff9f43;
+        }
+
+        .alert-info {
+            background-color: rgba(0, 207, 232, 0.1);
+            color: #00cfe8;
+        }
+
+        /* Card Styles */
         .card {
-            margin-bottom: 20px;
+            border: none;
+            border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Table Styles */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            padding: 1rem;
+            white-space: nowrap;
+        }
+
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        /* Form Styles */
+        .form-control {
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Button Styles */
+        .btn {
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+        }
+
+        /* Avatar Styles */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .avatar-sm {
+            width: 32px;
+            height: 32px;
+            font-size: 1rem;
+        }
+
+        .avatar-lg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .avatar-xl {
+            width: 64px;
+            height: 64px;
         }
     </style>
+
+    @stack('styles')
 </head>
+<body>
+    @auth
+        @if(in_array(auth()->user()->role, ['super_admin', 'manager']))
+            <!-- Include Navbar -->
+            @include('layouts.partials.navbar')
 
-<body class="d-flex flex-column h-100" id="app-body">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-gradient-primary">
-        <div class="container-fluid px-4">
-            <button class="btn btn-link d-block d-xl-none text-white me-0" type="button" id="toggleSidebar">
-                <i class="fas fa-bars"></i>
-            </button>
-            <a class="navbar-brand" href="{{ auth()->user()->role === 'admin' ? route('dashboard') : route('home') }}">{{ app()->getLocale() == 'ar' ? 'الصفا' : 'AlSafa' }}</a>
+            <!-- Include Sidebar -->
+            @include('layouts.partials.sidebar')
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="container-fluid">
+                    <!-- Flash Messages -->
+                    @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if(session('warning'))
+                        <div class="alert alert-warning">
+                            {{ session('warning') }}
+                        </div>
+                    @endif
+
+                    @if(session('info'))
+                        <div class="alert alert-info">
+                            {{ session('info') }}
+                        </div>
+                    @endif
+
+                    @if (isset($header))
+                        <header class="mb-4">
+                            {{ $header }}
+                        </header>
+                    @endif
+
+                    @yield('content')
+                </div>
+            </main>
+
+            <!-- Bootstrap Bundle with Popper -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
             
+            <!-- SweetAlert2 -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 
-            <div class="d-flex align-items-center">
-                @if(auth()->user()->role === 'admin')
-                <!-- Dashboard Link -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link text-white {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                            <i class="fas fa-tachometer-alt me-1"></i>
-                            {{ __('dashboard.title') }}
-                        </a>
-                    </li>
-                </ul>
-                @endif
+            <!-- Include Scripts -->
+            @include('layouts.partials.scripts')
+            
+            @stack('scripts')
+        @else
+            <script>window.location = "{{ route('home') }}";</script>
+        @endif
+    @else
+        <script>window.location = "{{ route('login') }}";</script>
+    @endauth
 
-                <!-- Language Switcher -->
-                <div class="nav-item me-3">
-                    <div class="dropdown">
-                        <button class="btn btn-light dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            @if(app()->getLocale() === 'ar')
-                                <i class="fas fa-globe me-1"></i> العربية
-                            @else
-                                <i class="fas fa-globe me-1"></i> English
-                            @endif
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="languageDropdown">
-                            <li><a class="dropdown-item {{ app()->getLocale() === 'ar' ? 'active' : '' }}" href="{{ route('change.language', 'ar') }}">العربية</a></li>
-                            <li><a class="dropdown-item {{ app()->getLocale() === 'en' ? 'active' : '' }}" href="{{ route('change.language', 'en') }}">English</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- User Dropdown -->
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i>
-                        {{ auth()->user()->name }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="fas fa-user-edit me-2"></i>{{ __('profile.edit_profile') }}</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger">
-                                    <i class="fas fa-sign-out-alt me-2"></i>{{ __('auth.logout') }}
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Wrapper -->
-    <div class="wrapper d-flex">
-        <!-- Sidebar -->
-        <aside class="sidenav" id="sidenav-main">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <a class="navbar-brand" href="{{ auth()->user()->role === 'admin' ? route('dashboard') : route('home') }}">{{ app()->getLocale() == 'ar' ? 'الصفا' : 'AlSafa' }}</a>
-                
-
-            <hr class="horizontal dark mt-0">
-
-            <div class="collapse navbar-collapse w-auto h-auto" id="sidenav-collapse-main">
-                <ul class="navbar-nav">
-                    <!-- Dashboard -->
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                            <i class="fas fa-chart-line"></i>
-                            <span>{{ __('dashboard.title') ?? 'لوحة التحكم' }}</span>
-                        </a>
-                    </li>
-
-                    <!-- Users Section -->
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
-                            <i class="fas fa-users"></i>
-                            <span>{{ __('users.title') ?? 'المستخدمين' }}</span>
-                        </a>
-                    </li>
-
-                    <!-- Branches Section -->
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('branches.*') ? 'active' : '' }}" href="{{ route('branches.index') }}">
-                            <i class="fas fa-code-branch"></i>
-                            <span>{{ __('branches.title') ?? 'الفروع' }}</span>
-                        </a>
-                    </li>
-
-                    <!-- Towers Section -->
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('towers.*') ? 'active' : '' }}" href="{{ route('towers.index') }}">
-                            <i class="fas fa-city"></i>
-                            <span>{{ __('towers.title') ?? 'الأبراج' }}</span>
-                        </a>
-                    </li>
-
-                    <!-- Sections Section -->
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('sections.*') ? 'active' : '' }}" href="{{ route('sections.index') }}">
-                            <i class="fas fa-th-large"></i>
-                            <span>{{ __('sections.title') ?? 'الأقسام الرئيسية' }}</span>
-                        </a>
-                    </li>
-
-                    <!-- Maintenance Requests -->
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('maintenance-requests.*') ? 'active' : '' }}" href="{{ route('maintenance-requests.index') }}">
-                            <i class="fas fa-tools"></i>
-                            <span>{{ __('maintenance.title') ?? 'طلب صيانة' }}</span>
-                        </a>
-                    </li>
-
-                    <!-- Activities -->
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('activities.*') ? 'active' : '' }}" href="{{ route('activities.index') }}">
-                            <i class="fas fa-history"></i>
-                            <span>{{ __('activity.title') ?? 'النشاطات' }}</span>
-                        </a>
-                    </li>
-                    
-                    <!-- Profile Section -->
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}">
-                            <i class="fas fa-user"></i>
-                            <span>{{ __('profile.edit_profile') ?? 'الملف الشخصي' }}</span>
-                        </a>
-                    </li>
-                    
-                    <!-- Home Link -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}">
-                            <i class="fas fa-home"></i>
-                            <span>{{ __('home.title') ?? 'الرئيسية' }}</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content w-100 bg-light">
-            <div class="container-fluid p-4">
-                <!-- Page Title -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="h2 mb-0">@yield('title')</h1>
-                    @yield('actions')
-                </div>
-
-                <!-- Content -->
-                @yield('content')
-            </div>
-        </main>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-white border-top">
-        <div class="container-fluid">
-            <div class="row align-items-center justify-content-center">
-                <div class="col-12 text-center">
-                    <div class="copyright text-center text-sm text-muted">
-                        © {{ date('Y') }} {{ config('app.name') }}. جميع الحقوق محفوظة.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Core JS Files -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- jQuery (needed for some Bootstrap plugins) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    @stack('scripts')
-
+    <!-- Custom Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle Sidebar
-            const toggleBtn = document.getElementById('toggleSidebar');
-            if (toggleBtn) {
-                const sidebar = document.getElementById('sidenav-main');
-                const mainContent = document.querySelector('.main-content');
-                
-                // Toggle sidebar on button click
-                toggleBtn.addEventListener('click', function() {
-                    if (sidebar) {
-                        sidebar.classList.toggle('collapsed');
-                        if (mainContent) {
-                            mainContent.classList.toggle('expanded');
-                        }
+            // Get elements
+            const sidebar = document.querySelector('.sidenav');
+            const mainContent = document.querySelector('.main-content');
+            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+            const mobileToggleBtn = document.getElementById('mobileSidebarToggle');
+
+            // Function to toggle sidebar
+            function toggleSidebar() {
+                if (sidebar && mainContent) {
+                    sidebar.classList.toggle('collapsed');
+                    
+                    // Update margins based on RTL
+                    const isRTL = document.dir === 'rtl';
+                    const margin = sidebar.classList.contains('collapsed') ? 
+                        'var(--sidebar-mini-width)' : 'var(--sidebar-width)';
+                    
+                    if (isRTL) {
+                        mainContent.style.marginRight = margin;
+                        mainContent.style.marginLeft = '0';
+                    } else {
+                        mainContent.style.marginLeft = margin;
+                        mainContent.style.marginRight = '0';
+                    }
+
+                    // Save state to localStorage
+                    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+                }
+            }
+
+            // Desktop sidebar toggle
+            if (sidebarCollapseBtn) {
+                sidebarCollapseBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleSidebar();
+                });
+            }
+
+            // Mobile sidebar toggle
+            if (mobileToggleBtn && sidebar) {
+                mobileToggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sidebar.classList.toggle('show');
+                });
+
+                // Close sidebar when clicking outside on mobile
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth < 992 && 
+                        !sidebar.contains(e.target) && 
+                        !mobileToggleBtn.contains(e.target)) {
+                        sidebar.classList.remove('show');
                     }
                 });
             }
+
+            // Restore sidebar state from localStorage
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isCollapsed && sidebar && mainContent) {
+                sidebar.classList.add('collapsed');
+                const margin = 'var(--sidebar-mini-width)';
+                if (document.dir === 'rtl') {
+                    mainContent.style.marginRight = margin;
+                    mainContent.style.marginLeft = '0';
+                } else {
+                    mainContent.style.marginLeft = margin;
+                    mainContent.style.marginRight = '0';
+                }
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth < 992) {
+                    if (sidebar) {
+                        sidebar.classList.remove('collapsed');
+                        sidebar.classList.remove('show');
+                    }
+                    if (mainContent) {
+                        mainContent.style.marginLeft = '0';
+                        mainContent.style.marginRight = '0';
+                    }
+                } else {
+                    if (mainContent) {
+                        const margin = sidebar && sidebar.classList.contains('collapsed') ? 
+                            'var(--sidebar-mini-width)' : 'var(--sidebar-width)';
+                        if (document.dir === 'rtl') {
+                            mainContent.style.marginRight = margin;
+                            mainContent.style.marginLeft = '0';
+                        } else {
+                            mainContent.style.marginLeft = margin;
+                            mainContent.style.marginRight = '0';
+                        }
+                    }
+                }
+            });
+
+            // Auto-hide alerts
+            const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.add('fade');
+                    setTimeout(() => alert.remove(), 150);
+                }, 3000);
+            });
         });
     </script>
 </body>
-</html>
+</html> 

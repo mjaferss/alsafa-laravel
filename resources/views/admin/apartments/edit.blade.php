@@ -1,4 +1,4 @@
-@extends('layouts.admin_new')
+@extends('layouts.admin')
 
 @section('title', __('apartments.edit'))
 

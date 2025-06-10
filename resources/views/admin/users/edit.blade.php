@@ -1,4 +1,4 @@
-@extends('layouts.admin_new')
+@extends('layouts.admin')
 
 @section('title', __('users.edit_user'))
 
@@ -8,13 +8,13 @@
         <div class="card-header pb-0">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">{{ __('users.edit_user') }}: {{ $user->name }}</h5>
-                <a href="{{ route('users.index') }}" class="btn btn-secondary btn-sm">
+                <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left me-2"></i> {{ __('common.back') }}
                 </a>
             </div>
         </div>
         <div class="card-body">
-            <form action="{{ route('users.update', $user) }}" method="POST">
+            <form action="{{ route('admin.users.update', $user) }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="row">
@@ -60,10 +60,10 @@
                             <label for="role" class="form-control-label">{{ __('users.fields.role') }}</label>
                             <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                                 <option value="">{{ __('users.fields.select_role') }}</option>
-                                <option value="super_admin" {{ old('role', $user->role) == 'super_admin' ? 'selected' : '' }}>super_admin</option>
-                                <option value="manager" {{ old('role', $user->role) == 'manager' ? 'selected' : '' }}>manager</option>
-                                <option value="supervisor" {{ old('role', $user->role) == 'supervisor' ? 'selected' : '' }}>supervisor</option>
-                                <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>user</option>
+                                <option value="super_admin" {{ old('role', $user->role) == 'super_admin' ? 'selected' : '' }}>{{ __('users.roles.super_admin') }}</option>
+                                <option value="manager" {{ old('role', $user->role) == 'manager' ? 'selected' : '' }}>{{ __('users.roles.manager') }}</option>
+                                <option value="supervisor" {{ old('role', $user->role) == 'supervisor' ? 'selected' : '' }}>{{ __('users.roles.supervisor') }}</option>
+                                <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>{{ __('users.roles.user') }}</option>
                             </select>
                             @error('role')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -105,7 +105,7 @@
                 <div class="row mt-4">
                     <div class="col-md-12 text-end">
                         <button type="submit" class="btn btn-primary">{{ __('common.save') }}</button>
-                        <a href="{{ route('users.index') }}" class="btn btn-secondary">{{ __('common.cancel') }}</a>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">{{ __('common.cancel') }}</a>
                     </div>
                 </div>
             </form>

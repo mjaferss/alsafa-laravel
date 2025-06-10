@@ -1,4 +1,4 @@
-@extends('layouts.admin_new')
+@extends('layouts.admin')
 
 @section('title', __('users.list'))
 
@@ -7,11 +7,11 @@
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">{{ __('users.list_title') }}</h5>
-                @if(in_array(auth()->user()->role, ['super_admin', 'manager']))
-                    <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">
+                @can('create', App\Models\User::class)
+                    <a href="{{ route('admin.users.create') }}" class="btn bg-gradient-primary btn-sm mb-0">
                         <i class="fas fa-plus me-2"></i> {{ __('users.add_new') }}
                     </a>
-                @endif
+                @endcan
             </div>
             <div class="mt-3">
                 <form action="{{ route('admin.users.index') }}" method="GET" class="row g-3">
@@ -38,7 +38,9 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">{{ __('common.search') }}</button>
+                        <button type="submit" class="btn bg-gradient-info w-100 mb-0">
+                            <i class="fas fa-search me-2"></i> {{ __('common.search') }}
+                        </button>
                     </div>
                 </form>
             </div>
@@ -48,21 +50,21 @@
                 <table class="table align-items-center mb-0">
                     <thead>
                         <tr>
-                            <th>{{ __('users.fields.name') }}</th>
-                            <th class="d-none d-lg-table-cell">{{ __('users.fields.email') }}</th>
-                            <th>{{ __('users.fields.role') }}</th>
-                            <th class="d-none d-lg-table-cell">{{ __('users.fields.branch') }}</th>
-                            <th>{{ __('users.fields.active') }}</th>
-                            <th class="d-none d-md-table-cell">{{ __('users.fields.created_at') }}</th>
-                            <th class="text-center">{{ __('common.action_text') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ __('users.fields.name') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-lg-table-cell">{{ __('users.fields.email') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ __('users.fields.role') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-lg-table-cell">{{ __('users.fields.branch') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ __('users.fields.active') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-md-table-cell">{{ __('users.fields.created_at') }}</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">{{ __('common.action_text') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($users as $user)
                         <tr>
                             <td>
-                                <div class="d-flex px-2 py-1">
-                                    <div class="d-flex flex-column justify-content-center">
+                                <div class="d-flex px-2">
+                                    <div>
                                         <h6 class="mb-0 text-sm">{{ $user->name }}</h6>
                                     </div>
                                 </div>
@@ -77,35 +79,37 @@
                                 <p class="text-sm font-weight-bold mb-0">{{ $user->branch?->name ?? '-' }}</p>
                             </td>
                             <td>
-                                <span class="badge {{ $user->is_active ? 'bg-success' : 'bg-danger' }}">
+                                <span class="badge badge-sm {{ $user->is_active ? 'bg-gradient-success' : 'bg-gradient-danger' }}">
                                     {{ $user->is_active ? __('users.status.active') : __('users.status.inactive') }}
                                 </span>
                             </td>
                             <td class="d-none d-md-table-cell">
                                 <p class="text-sm font-weight-bold mb-0">{{ $user->created_at->format('Y-m-d') }}</p>
                             </td>
-                            <td class="align-middle text-center text-sm">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-icon-only text-dark mb-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v"></i>
+                            <td class="align-middle text-center">
+                                <div class="ms-auto">
+                                    <button class="btn btn-link text-dark px-3 mb-0" type="button" id="dropdownMenuButton{{ $user->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v text-xs" aria-hidden="true"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
+                                    <ul class="dropdown-menu shadow" aria-labelledby="dropdownMenuButton{{ $user->id }}">
                                         <li>
                                             <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}">
                                                 <i class="fas fa-eye me-2"></i> {{ __('users.actions.view') }}
                                             </a>
                                         </li>
-                                        @if(in_array(auth()->user()->role, ['super_admin', 'manager']))
+                                        @if(auth()->user()->role === 'super_admin' || (auth()->user()->role === 'manager' && $user->role !== 'super_admin'))
                                             <li>
                                                 <a class="dropdown-item" href="{{ route('admin.users.edit', $user) }}">
                                                     <i class="fas fa-edit me-2"></i> {{ __('users.actions.edit') }}
                                                 </a>
                                             </li>
+                                        @endif
+                                        @if(auth()->user()->role === 'super_admin' || (auth()->user()->role === 'manager' && $user->role !== 'super_admin' && $user->role !== 'manager'))
                                             <li>
                                                 <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="dropdown-item" onclick="return confirm('{{ __('users.confirm_delete') }}')">
+                                                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('{{ __('users.confirm_delete') }}')">
                                                         <i class="fas fa-trash me-2"></i> {{ __('users.actions.delete') }}
                                                     </button>
                                                 </form>
@@ -113,9 +117,13 @@
                                         @endif
                                     </ul>
                                 </div>
-                                <button type="button" class="btn {{ $user->is_active ? 'btn-secondary' : 'btn-success' }} btn-sm toggle-status" data-user-id="{{ $user->id }}" data-status="{{ $user->is_active ? 1 : 0 }}" title="{{ $user->is_active ? __('users.status.inactive') : __('users.status.active') }}">
-                                    <i class="fas {{ $user->is_active ? 'fa-ban' : 'fa-check' }}"></i>
-                                </button>
+                                @can('update', $user)
+                                    <button type="button" class="btn btn-link {{ $user->is_active ? 'text-danger' : 'text-success' }} mb-0 px-3" 
+                                            onclick="toggleUserStatus({{ $user->id }}, {{ $user->is_active ? 1 : 0 }})"
+                                            title="{{ $user->is_active ? __('users.status.inactive') : __('users.status.active') }}">
+                                        <i class="fas {{ $user->is_active ? 'fa-ban' : 'fa-check' }} text-xs"></i>
+                                    </button>
+                                @endcan
                             </td>
                         </tr>
 
@@ -128,15 +136,15 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        @if(in_array(auth()->user()->role, ['super_admin', 'manager']))
-                                            <div class="card card-body">
+                                        <div class="card">
+                                            <div class="card-body">
                                                 <div class="row gx-4">
                                                     <div class="col-auto">
                                                         <div class="avatar avatar-xl position-relative">
                                                             @if($user->avatar)
                                                                 <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" class="w-100 border-radius-lg shadow-sm">
                                                             @else
-                                                                <div class="avatar-title rounded-circle bg-primary text-white">
+                                                                <div class="avatar-title rounded-circle bg-gradient-primary text-white">
                                                                     {{ strtoupper(substr($user->name, 0, 1)) }}
                                                                 </div>
                                                             @endif
@@ -152,72 +160,58 @@
                                                 <div class="row mt-4">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('users.fields.email') }}</label>
-                                                            <p class="form-control-static">{{ $user->email }}</p>
+                                                            <label class="form-control-label h6">{{ __('users.fields.email') }}</label>
+                                                            <p class="text-sm">{{ $user->email }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('users.fields.phone') }}</label>
-                                                            <p class="form-control-static">{{ $user->phone ?? '-' }}</p>
+                                                            <label class="form-control-label h6">{{ __('users.fields.phone') }}</label>
+                                                            <p class="text-sm">{{ $user->phone ?? '-' }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('users.fields.role') }}</label>
-                                                            <p class="form-control-static">{{ __('users.roles.' . $user->role) }}</p>
+                                                            <label class="form-control-label h6">{{ __('users.fields.role') }}</label>
+                                                            <p class="text-sm">{{ __('users.roles.' . $user->role) }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('users.fields.branch') }}</label>
-                                                            <p class="form-control-static">{{ $user->branch?->name ?? '-' }}</p>
+                                                            <label class="form-control-label h6">{{ __('users.fields.branch') }}</label>
+                                                            <p class="text-sm">{{ $user->branch?->name ?? '-' }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('users.fields.created_at') }}</label>
-                                                            <p class="form-control-static">{{ $user->created_at->format('Y-m-d H:i') }}</p>
+                                                            <label class="form-control-label h6">{{ __('users.fields.created_at') }}</label>
+                                                            <p class="text-sm">{{ $user->created_at->format('Y-m-d H:i') }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('users.fields.updated_at') }}</label>
-                                                            <p class="form-control-static">{{ $user->updated_at->format('Y-m-d H:i') }}</p>
+                                                            <label class="form-control-label h6">{{ __('users.fields.updated_at') }}</label>
+                                                            <p class="text-sm">{{ $user->updated_at->format('Y-m-d H:i') }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('users.fields.last_login') }}</label>
-                                                            <p class="form-control-static">{{ $user->last_login_at ? $user->last_login_at->format('Y-m-d H:i') : '-' }}</p>
+                                                            <label class="form-control-label h6">{{ __('users.fields.last_login') }}</label>
+                                                            <p class="text-sm">{{ $user->last_login_at ? $user->last_login_at->format('Y-m-d H:i') : '-' }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="form-control-label">{{ __('users.fields.password_changed') }}</label>
-                                                            <p class="form-control-static">{{ $user->password_changed_at ? $user->password_changed_at->format('Y-m-d H:i') : '-' }}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="form-control-label">{{ __('users.fields.active') }}</label>
-                                                            <p class="form-control-static">
-                                                                <span class="badge {{ $user->is_active ? 'bg-gradient-success' : 'bg-gradient-secondary' }}">
-                                                                    {{ $user->is_active ? __('users.status.active') : __('users.status.inactive') }}
-                                                                </span>
-                                                            </p>
+                                                            <label class="form-control-label h6">{{ __('users.fields.password_changed') }}</label>
+                                                            <p class="text-sm">{{ $user->password_changed_at ? $user->password_changed_at->format('Y-m-d H:i') : '-' }}</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        @else
-                                            <div class="alert alert-warning">
-                                                {{ __('users.unauthorized_access') }}
-                                            </div>
-                                        @endif
+                                        </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('common.close') }}</button>
+                                        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">{{ __('common.close') }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -225,71 +219,100 @@
                         @endforeach
                     </tbody>
                 </table>
-                <div class="d-flex justify-content-center mt-4">
-                    {{ $users->appends(request()->query())->links('vendor.pagination.bootstrap-5') }}
-                </div>
             </div>
+            @if($users->hasPages())
+                <div class="card-footer py-3">
+                    <nav aria-label="{{ __('pagination.pages') }}">
+                        <ul class="pagination justify-content-center mb-0">
+                            {{-- Previous Page Link --}}
+                            @if($users->onFirstPage())
+                                <li class="page-item disabled">
+                                    <span class="page-link bg-transparent border-0" aria-hidden="true">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link bg-transparent border-0" href="{{ $users->previousPageUrl() }}" rel="prev">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                                @if($page == $users->currentPage())
+                                    <li class="page-item active">
+                                        <span class="page-link bg-gradient-primary border-0">{{ $page }}</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link bg-transparent border-0" href="{{ $url }}">{{ $page }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if($users->hasMorePages())
+                                <li class="page-item">
+                                    <a class="page-link bg-transparent border-0" href="{{ $users->nextPageUrl() }}" rel="next">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            @else
+                                <li class="page-item disabled">
+                                    <span class="page-link bg-transparent border-0" aria-hidden="true">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </li>
+                            @endif
+                        </ul>
+                    </nav>
+                    <p class="text-sm text-center text-secondary mt-2 mb-0">
+                        {{ __('pagination.showing') }} {{ $users->firstItem() }}-{{ $users->lastItem() }} {{ __('pagination.of') }} {{ $users->total() }} {{ __('pagination.entries') }}
+                    </p>
+                </div>
+            @endif
         </div>
     </div>
 @endsection
 
 @push('scripts')
 <script>
-    document.querySelectorAll('.toggle-status').forEach(button => {
-        button.addEventListener('click', function() {
-            const userId = this.dataset.userId;
-            const currentStatus = this.dataset.status;
-            
-            fetch(`/admin/users/${userId}/toggle-status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update button appearance
-                    this.classList.toggle('btn-secondary');
-                    this.classList.toggle('btn-success');
-                    
-                    // Update icon
-                    const icon = this.querySelector('i');
-                    icon.classList.toggle('fa-ban');
-                    icon.classList.toggle('fa-check');
-                    
-                    // Update status badge
-                    const statusBadge = this.closest('tr').querySelector('.badge');
-                    statusBadge.classList.toggle('bg-success');
-                    statusBadge.classList.toggle('bg-danger');
-                    statusBadge.textContent = currentStatus == 1 
-                        ? '{{ __("users.status.inactive") }}'
-                        : '{{ __("users.status.active") }}';
-                    
-                    // Update data attribute
-                    this.dataset.status = currentStatus == 1 ? '0' : '1';
-                    
-                    // Show success message
-                    Swal.fire({
-                        icon: 'success',
-                        title: '{{ __("common.success") }}',
-                        text: data.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: '{{ __("common.error") }}',
-                    text: '{{ __("common.something_went_wrong") }}'
-                });
-            });
-        });
+console.log('Loading users index script...');
+
+// Initialize dropdowns
+document.addEventListener('DOMContentLoaded', function() {
+    var dropdownElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'))
+    var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+        return new bootstrap.Dropdown(dropdownToggleEl)
     });
+});
+
+// Toggle user status function
+function toggleUserStatus(userId, currentStatus) {
+    if (confirm(currentStatus ? '{{ __("users.confirm_deactivate") }}' : '{{ __("users.confirm_activate") }}')) {
+        fetch(`{{ url('admin/users') }}/${userId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('{{ __("common.error_occurred") }}');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('{{ __("common.error_occurred") }}');
+        });
+    }
+}
 </script>
 @endpush
 
@@ -306,6 +329,35 @@
     }
     .table td .d-flex.gap-2 {
         gap: 0.5rem !important;
+    }
+    .pagination .page-link {
+        padding: 0.5rem 0.75rem;
+        margin: 0 3px;
+        color: #67748e;
+        transition: all 0.2s ease;
+        border-radius: 0.5rem;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+        color: #344767;
+    }
+
+    .pagination .page-item.active .page-link {
+        color: #fff;
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.125);
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #d3d3d3;
+    }
+
+    @media (max-width: 768px) {
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
     }
 </style>
 @endpush

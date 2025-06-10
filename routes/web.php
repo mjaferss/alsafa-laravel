@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\ApartmentTypeController;
 use App\Http\Controllers\Admin\TowerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,15 +24,35 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Redirect root to login
+// الصفحة الرئيسية
 Route::get('/', function () {
-    return redirect('/login');
-});
+    // إذا كان المستخدم مسجل دخوله
+    if (Auth::check()) {
+        $user = Auth::user();
+        
+        // التحقق من صلاحيات المستخدم
+        if ($user->hasRole(['super_admin', 'manager'])) {
+            return redirect()->route('admin.dashboard');
+        } else {
+            return redirect()->route('dashboard');
+        }
+    }
+    
+    // إذا لم يكن مسجل دخوله، عرض الصفحة الرئيسية
+    return view('welcome');
+})->name('home');
 
-// Redirect old dashboard URL to new admin dashboard
+// لوحة التحكم العامة
 Route::get('/dashboard', function () {
-    return redirect()->route('admin.dashboard');
-})->middleware('auth');
+    $user = Auth::user();
+    
+    // التوجيه حسب صلاحيات المستخدم
+    if ($user && $user->hasRole(['super_admin', 'manager'])) {
+        return redirect()->route('admin.dashboard');
+    }
+    
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware(['auth', 'role:super_admin,manager'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
@@ -85,12 +107,8 @@ Route::middleware('auth')->group(function () {
 });
 
 // Language Switcher
-Route::get('/language/{locale}', function ($locale) {
-    if (in_array($locale, ['ar', 'en'])) {
-        session(['locale' => $locale]);
-        app()->setLocale($locale);
-    }
-    return redirect()->back();
-})->middleware('web')->name('change.language');
+Route::get('/language/{locale}', [LanguageController::class, 'switchLanguage'])
+    ->middleware('web')
+    ->name('change.language');
 
 require __DIR__.'/auth.php';

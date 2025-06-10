@@ -27,8 +27,18 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string', 'email', 'exists:users,email'],
             'password' => ['required', 'string'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => trans('auth.email_required'),
+            'email.email' => trans('auth.email_invalid'),
+            'email.exists' => trans('auth.email_not_found'),
+            'password.required' => trans('auth.password_required'),
         ];
     }
 
@@ -41,15 +51,29 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        try {
+            if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'email' => trans('auth.failed'),
+                ]);
+            }
 
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
+            // التحقق من حالة المستخدم
+            $user = Auth::user();
+            if ($user && !$user->is_active) {
+                Auth::logout();
+                throw ValidationException::withMessages([
+                    'email' => trans('auth.inactive'),
+                ]);
+            }
+
+            RateLimiter::clear($this->throttleKey());
+            
+        } catch (\Exception $e) {
+            \Log::error('Login error: ' . $e->getMessage());
+            throw $e;
         }
-
-        RateLimiter::clear($this->throttleKey());
     }
 
     /**

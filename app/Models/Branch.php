@@ -17,6 +17,7 @@ class Branch extends Model
         'address_ar',
         'address_en',
         'phone',
+        'email',
         'is_active'
     ];
 

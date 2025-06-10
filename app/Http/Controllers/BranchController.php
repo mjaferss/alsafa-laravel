@@ -42,9 +42,8 @@ class BranchController extends Controller
      */
     public function create()
     {
-        // Verificar si el usuario tiene permiso para crear sucursales
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('branches.index')
+            return redirect()->route('admin.branches.index')
                 ->with('error', __('branches.unauthorized_edit'));
         }
         
@@ -56,9 +55,8 @@ class BranchController extends Controller
      */
     public function store(Request $request)
     {
-        // Verificar si el usuario tiene permiso para crear sucursales
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('branches.index')
+            return redirect()->route('admin.branches.index')
                 ->with('error', __('branches.unauthorized_edit'));
         }
         
@@ -71,12 +69,11 @@ class BranchController extends Controller
             'email' => 'required|email|max:255',
         ]);
         
-        // Manejar el estado activo/inactivo
         $validated['is_active'] = $request->has('is_active');
 
         Branch::create($validated);
 
-        return redirect()->route('branches.index')
+        return redirect()->route('admin.branches.index')
             ->with('success', __('branches.messages.created'));
     }
 
@@ -85,9 +82,8 @@ class BranchController extends Controller
      */
     public function edit(Branch $branch)
     {
-        // Verificar si el usuario tiene permiso para editar sucursales
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('branches.index')
+            return redirect()->route('admin.branches.index')
                 ->with('error', __('branches.unauthorized_edit'));
         }
         
@@ -99,9 +95,8 @@ class BranchController extends Controller
      */
     public function update(Request $request, Branch $branch)
     {
-        // Verificar si el usuario tiene permiso para actualizar sucursales
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('branches.index')
+            return redirect()->route('admin.branches.index')
                 ->with('error', __('branches.unauthorized_edit'));
         }
         
@@ -114,13 +109,18 @@ class BranchController extends Controller
             'email' => 'required|email|max:255',
         ]);
         
-        // Manejar el estado activo/inactivo
         $validated['is_active'] = $request->has('is_active');
 
-        $branch->update($validated);
-
-        return redirect()->route('branches.index')
-            ->with('success', __('branches.messages.updated'));
+        try {
+            $branch->update($validated);
+            
+            return redirect()->route('admin.branches.index')
+                ->with('success', __('branches.messages.updated'));
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', __('branches.messages.update_failed'))
+                ->withInput();
+        }
     }
 
     /**
@@ -128,21 +128,19 @@ class BranchController extends Controller
      */
     public function destroy(Branch $branch)
     {
-        // Verificar si el usuario tiene permiso para eliminar sucursales
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
-            return redirect()->route('branches.index')
+            return redirect()->route('admin.branches.index')
                 ->with('error', __('branches.unauthorized_edit'));
         }
         
-        // Verificar si hay usuarios asociados a esta sucursal
         if ($branch->users()->count() > 0) {
-            return redirect()->route('branches.index')
+            return redirect()->route('admin.branches.index')
                 ->with('error', __('branches.messages.cannot_delete_with_users'));
         }
         
         $branch->delete();
 
-        return redirect()->route('branches.index')
+        return redirect()->route('admin.branches.index')
             ->with('success', __('branches.messages.deleted'));
     }
 
@@ -151,7 +149,6 @@ class BranchController extends Controller
      */
     public function toggleStatus(Branch $branch)
     {
-        // Verificar si el usuario tiene permiso para cambiar el estado de las sucursales
         if (!in_array(auth()->user()->role, ['super_admin', 'manager'])) {
             return response()->json([
                 'success' => false,
@@ -159,14 +156,19 @@ class BranchController extends Controller
             ], 403);
         }
         
-        $branch->update([
-            'is_active' => !$branch->is_active
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => __('branches.messages.status_updated'),
-            'is_active' => $branch->is_active
-        ]);
+        try {
+            $branch->update(['is_active' => !$branch->is_active]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => __('branches.messages.status_updated'),
+                'is_active' => $branch->is_active
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('branches.messages.update_failed')
+            ], 500);
+        }
     }
 }

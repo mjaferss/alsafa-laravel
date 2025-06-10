@@ -17,16 +17,20 @@
         @csrf
         @method('patch')
 
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+        <div class="mb-3">
+            <label for="name" class="form-label">{{ __('profile.name') }}</label>
+            <input id="name" name="name" type="text" class="form-control" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name" />
+            @error('name')
+                <div class="text-danger mt-1">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+        <div class="mb-3">
+            <label for="email" class="form-label">{{ __('profile.email') }}</label>
+            <input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email) }}" required autocomplete="username" />
+            @error('email')
+                <div class="text-danger mt-1">{{ $message }}</div>
+            @enderror
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
@@ -47,18 +51,24 @@
             @endif
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+        <div class="mb-3">
+            <label for="phone" class="form-label">{{ __('profile.phone') }}</label>
+            <input id="phone" name="phone" type="text" class="form-control" value="{{ old('phone', $user->phone) }}" />
+            @error('phone')
+                <div class="text-danger mt-1">{{ $message }}</div>
+            @enderror
+        </div>
 
+        <div class="d-flex justify-content-end mt-4">
             @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
+                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-success me-3 mt-2">
+                    {{ __('profile.profile_updated') }}
+                </div>
             @endif
+
+            <button type="submit" class="btn bg-gradient-primary">
+                {{ __('profile.update_profile') }}
+            </button>
         </div>
     </form>
 </section>

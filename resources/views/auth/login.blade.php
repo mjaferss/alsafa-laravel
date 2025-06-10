@@ -25,7 +25,7 @@
 
                         @error('email')
                             <div class="alert alert-danger mb-4">
-                                {{ __('auth.messages.'.$message) }}
+                                {{ __($message) }}
                             </div>
                         @enderror
 

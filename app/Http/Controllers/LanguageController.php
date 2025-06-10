@@ -3,19 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Session;
 
 class LanguageController extends Controller
 {
-    public function changeLanguage($locale)
+    public function switchLanguage($locale)
     {
+        // Validate locale
         if (!in_array($locale, ['ar', 'en'])) {
-            abort(400);
+            $locale = config('app.fallback_locale', 'ar');
         }
 
-        App::setLocale($locale);
-        Session::put('locale', $locale);
+        // Set locale in session
+        session()->put('locale', $locale);
+        
+        // Set RTL/LTR direction
+        $isRtl = in_array($locale, config('app.rtl_locales', ['ar']));
+        session()->put('dir', $isRtl ? 'rtl' : 'ltr');
+
+        // Set app locale
+        app()->setLocale($locale);
 
         return redirect()->back();
     }
